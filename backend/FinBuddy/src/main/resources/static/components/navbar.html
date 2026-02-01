@@ -1,0 +1,40 @@
+<!-- Top Navbar Component -->
+<nav class="navbar">
+  <div class="navbar-left">
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="portfolio-selector-nav">
+      <i class="fas fa-briefcase"></i>
+      <select id="portfolioSelect" class="portfolio-select">
+        <option value="">Select Portfolio</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="navbar-center">
+    <!-- Live Stock Ticker -->
+    <div class="stock-ticker-mini">
+      <div class="ticker-scroll" id="stockTicker">
+        <span class="ticker-item">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    <button class="navbar-btn" id="refreshDataBtn" title="Refresh Data">
+      <i class="fas fa-sync-alt"></i>
+    </button>
+    <button class="navbar-btn" id="notificationsBtn" title="Notifications">
+      <i class="fas fa-bell"></i>
+      <span class="notification-badge">3</span>
+    </button>
+    <button class="navbar-btn" id="themeToggle" title="Toggle Theme">
+      <i class="fas fa-moon"></i>
+    </button>
+    <button class="navbar-btn btn-primary" id="createPortfolioBtn">
+      <i class="fas fa-plus"></i>
+      <span class="btn-text">New Portfolio</span>
+    </button>
+  </div>
+</nav>
