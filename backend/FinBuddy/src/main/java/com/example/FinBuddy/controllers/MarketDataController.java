@@ -58,6 +58,15 @@ public class MarketDataController {
     }
 
     /**
+     * Get batch detailed quotes with change information
+     */
+    @PostMapping("/batch-quotes")
+    public ResponseEntity<List<Map<String, Object>>> getBatchQuotes(@RequestBody List<String> symbols) {
+        List<Map<String, Object>> quotes = stockPriceService.getBatchDetailedQuotes(symbols);
+        return ResponseEntity.ok(quotes);
+    }
+
+    /**
      * Get exchange rate
      */
     @GetMapping("/exchange-rate")
@@ -76,11 +85,8 @@ public class MarketDataController {
      */
     @GetMapping("/benchmark/{symbol}")
     public ResponseEntity<Map<String, Object>> getBenchmarkValue(@PathVariable String symbol) {
-        BigDecimal value = stockPriceService.getBenchmarkValue(symbol);
-        return ResponseEntity.ok(Map.of(
-                "symbol", symbol,
-                "value", value,
-                "timestamp", System.currentTimeMillis()));
+        Map<String, Object> benchmark = stockPriceService.getBenchmarkWithChange(symbol);
+        return ResponseEntity.ok(benchmark);
     }
 
     /**
@@ -99,5 +105,14 @@ public class MarketDataController {
     public ResponseEntity<Map<String, String>> clearCache() {
         stockPriceService.clearCache();
         return ResponseEntity.ok(Map.of("message", "Price cache cleared successfully"));
+    }
+
+    /**
+     * Search for stocks/assets by symbol or name
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<Map<String, Object>>> searchStocks(@RequestParam String query) {
+        List<Map<String, Object>> results = stockPriceService.searchStocks(query);
+        return ResponseEntity.ok(results);
     }
 }

@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analytics & Benchmarking - FinBuddy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/analytics-wishlist.css" />
+  </head>
+  <body>
+    <!-- Sidebar Navigation -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Top Navigation Bar -->
+      <div id="navbar-container"></div>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <div class="content-wrapper">
+          <!-- Page Header -->
+          <header class="page-header">
+            <div>
+              <h1 class="page-title">
+                <i class="fas fa-chart-bar"></i>
+                Analytics & Benchmarking
+              </h1>
+              <p class="page-subtitle">
+                Deep insights into your portfolio performance with market
+                benchmarks
+              </p>
+            </div>
+            <div class="header-actions">
+              <select id="timeRangeSelect" class="select-input">
+                <option value="1M">Last Month</option>
+                <option value="3M">Last 3 Months</option>
+                <option value="6M" selected>Last 6 Months</option>
+                <option value="1Y">Last Year</option>
+                <option value="ALL">All Time</option>
+              </select>
+            </div>
+          </header>
+
+          <!-- Performance Overview -->
+          <section class="section-card" aria-labelledby="performance-heading">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-tachometer-alt"></i>
+                <h2 id="performance-heading">Performance Overview</h2>
+              </div>
+            </div>
+            <div class="analytics-grid">
+              <article class="metric-card">
+                <div class="metric-icon gradient-blue">
+                  <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="metric-content">
+                  <h3 class="metric-label">Total Returns</h3>
+                  <p class="metric-value" id="totalReturns">$0.00</p>
+                  <span class="metric-change positive" id="returnsChange">
+                    <i class="fas fa-arrow-up"></i> 0%
+                  </span>
+                </div>
+              </article>
+
+              <article class="metric-card">
+                <div class="metric-icon gradient-green">
+                  <i class="fas fa-percentage"></i>
+                </div>
+                <div class="metric-content">
+                  <h3 class="metric-label">Return Rate (CAGR)</h3>
+                  <p class="metric-value" id="cagrValue">0.0%</p>
+                  <span class="metric-description">Compound Annual Growth</span>
+                </div>
+              </article>
+
+              <article class="metric-card">
+                <div class="metric-icon gradient-purple">
+                  <i class="fas fa-chart-area"></i>
+                </div>
+                <div class="metric-content">
+                  <h3 class="metric-label">Volatility</h3>
+                  <p class="metric-value" id="volatilityValue">0.0%</p>
+                  <span class="metric-description">Standard Deviation</span>
+                </div>
+              </article>
+
+              <article class="metric-card">
+                <div class="metric-icon gradient-orange">
+                  <i class="fas fa-balance-scale"></i>
+                </div>
+                <div class="metric-content">
+                  <h3 class="metric-label">Sharpe Ratio</h3>
+                  <p class="metric-value" id="sharpeRatio">0.00</p>
+                  <span class="metric-description">Risk-Adjusted Return</span>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <!-- Benchmark Comparison -->
+          <section class="section-card" aria-labelledby="benchmark-heading">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-trophy"></i>
+                <h2 id="benchmark-heading">Benchmark Comparison</h2>
+              </div>
+              <div class="header-actions">
+                <button class="btn-secondary" id="addBenchmarkBtn">
+                  <i class="fas fa-plus"></i> Add Benchmark
+                </button>
+              </div>
+            </div>
+            <div class="benchmark-comparison-grid">
+              <div class="comparison-chart">
+                <canvas
+                  id="performanceChart"
+                  aria-label="Portfolio vs Benchmark Performance Chart"
+                ></canvas>
+              </div>
+              <aside class="benchmark-list">
+                <h3 class="list-title">Active Benchmarks</h3>
+                <ul class="benchmarks" id="benchmarksList">
+                  <li class="benchmark-item">
+                    <div class="benchmark-info">
+                      <span class="benchmark-name">S&P 500</span>
+                      <span class="benchmark-ticker">^GSPC</span>
+                    </div>
+                    <div class="benchmark-performance">
+                      <span class="performance-value positive">+12.5%</span>
+                      <button class="btn-icon" aria-label="Remove benchmark">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </li>
+                  <li class="benchmark-item">
+                    <div class="benchmark-info">
+                      <span class="benchmark-name">NASDAQ</span>
+                      <span class="benchmark-ticker">^IXIC</span>
+                    </div>
+                    <div class="benchmark-performance">
+                      <span class="performance-value positive">+18.3%</span>
+                      <button class="btn-icon" aria-label="Remove benchmark">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </li>
+                  <li class="benchmark-item">
+                    <div class="benchmark-info">
+                      <span class="benchmark-name">NIFTY 50</span>
+                      <span class="benchmark-ticker">^NSEI</span>
+                    </div>
+                    <div class="benchmark-performance">
+                      <span class="performance-value positive">+15.7%</span>
+                      <button class="btn-icon" aria-label="Remove benchmark">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </li>
+                </ul>
+              </aside>
+            </div>
+          </section>
+
+          <!-- Asset Allocation Analysis -->
+          <section class="section-card" aria-labelledby="allocation-heading">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-pie-chart"></i>
+                <h2 id="allocation-heading">Asset Allocation</h2>
+              </div>
+            </div>
+            <div class="allocation-grid">
+              <div class="chart-container">
+                <canvas
+                  id="allocationChart"
+                  aria-label="Asset allocation pie chart"
+                ></canvas>
+              </div>
+              <div class="allocation-breakdown">
+                <h3 class="breakdown-title">Allocation Breakdown</h3>
+                <ul class="allocation-list" id="allocationList">
+                  <li class="allocation-item">
+                    <div class="allocation-info">
+                      <span
+                        class="color-indicator"
+                        style="background-color: #4f46e5"
+                      ></span>
+                      <span class="allocation-name">Stocks</span>
+                    </div>
+                    <div class="allocation-stats">
+                      <span class="allocation-percent">45%</span>
+                      <span class="allocation-value">$45,000</span>
+                    </div>
+                  </li>
+                  <li class="allocation-item">
+                    <div class="allocation-info">
+                      <span
+                        class="color-indicator"
+                        style="background-color: #10b981"
+                      ></span>
+                      <span class="allocation-name">Bonds</span>
+                    </div>
+                    <div class="allocation-stats">
+                      <span class="allocation-percent">30%</span>
+                      <span class="allocation-value">$30,000</span>
+                    </div>
+                  </li>
+                  <li class="allocation-item">
+                    <div class="allocation-info">
+                      <span
+                        class="color-indicator"
+                        style="background-color: #f59e0b"
+                      ></span>
+                      <span class="allocation-name">Mutual Funds</span>
+                    </div>
+                    <div class="allocation-stats">
+                      <span class="allocation-percent">15%</span>
+                      <span class="allocation-value">$15,000</span>
+                    </div>
+                  </li>
+                  <li class="allocation-item">
+                    <div class="allocation-info">
+                      <span
+                        class="color-indicator"
+                        style="background-color: #8b5cf6"
+                      ></span>
+                      <span class="allocation-name">SIP</span>
+                    </div>
+                    <div class="allocation-stats">
+                      <span class="allocation-percent">10%</span>
+                      <span class="allocation-value">$10,000</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- Risk Analysis -->
+          <section class="section-card" aria-labelledby="risk-heading">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h2 id="risk-heading">Risk Analysis</h2>
+              </div>
+            </div>
+            <div class="risk-grid">
+              <article class="risk-card">
+                <div class="risk-header">
+                  <h3>Portfolio Risk Level</h3>
+                  <span class="risk-badge moderate">Moderate</span>
+                </div>
+                <div class="risk-meter">
+                  <div class="risk-bar" style="width: 60%">
+                    <span class="risk-value">6/10</span>
+                  </div>
+                </div>
+              </article>
+
+              <article class="risk-card">
+                <h3>Beta (Market Sensitivity)</h3>
+                <p class="risk-metric" id="betaValue">1.05</p>
+                <small class="risk-description">
+                  Your portfolio is slightly more volatile than the market
+                </small>
+              </article>
+
+              <article class="risk-card">
+                <h3>Maximum Drawdown</h3>
+                <p class="risk-metric negative" id="maxDrawdown">-12.4%</p>
+                <small class="risk-description">
+                  Largest peak-to-trough decline
+                </small>
+              </article>
+
+              <article class="risk-card">
+                <h3>Value at Risk (95%)</h3>
+                <p class="risk-metric" id="varValue">$2,450</p>
+                <small class="risk-description">
+                  Maximum expected loss in 1 day
+                </small>
+              </article>
+            </div>
+          </section>
+
+          <!-- Top Performers & Losers -->
+          <section class="section-card" aria-labelledby="performers-heading">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-star"></i>
+                <h2 id="performers-heading">Top Performers & Losers</h2>
+              </div>
+            </div>
+            <div class="performers-grid">
+              <article class="performers-card">
+                <h3 class="performers-title">
+                  <i class="fas fa-arrow-up text-success"></i> Top Gainers
+                </h3>
+                <ul class="performers-list" id="topGainers">
+                  <li class="performer-item">
+                    <div class="performer-info">
+                      <span class="performer-symbol">AAPL</span>
+                      <span class="performer-name">Apple Inc.</span>
+                    </div>
+                    <span class="performer-return positive">+24.5%</span>
+                  </li>
+                  <li class="performer-item">
+                    <div class="performer-info">
+                      <span class="performer-symbol">NVDA</span>
+                      <span class="performer-name">NVIDIA Corp.</span>
+                    </div>
+                    <span class="performer-return positive">+18.7%</span>
+                  </li>
+                  <li class="performer-item">
+                    <div class="performer-info">
+                      <span class="performer-symbol">MSFT</span>
+                      <span class="performer-name">Microsoft</span>
+                    </div>
+                    <span class="performer-return positive">+15.3%</span>
+                  </li>
+                </ul>
+              </article>
+
+              <article class="performers-card">
+                <h3 class="performers-title">
+                  <i class="fas fa-arrow-down text-danger"></i> Top Losers
+                </h3>
+                <ul class="performers-list" id="topLosers">
+                  <li class="performer-item">
+                    <div class="performer-info">
+                      <span class="performer-symbol">XYZ</span>
+                      <span class="performer-name">XYZ Corp.</span>
+                    </div>
+                    <span class="performer-return negative">-8.2%</span>
+                  </li>
+                  <li class="performer-item">
+                    <div class="performer-info">
+                      <span class="performer-symbol">ABC</span>
+                      <span class="performer-name">ABC Ltd.</span>
+                    </div>
+                    <span class="performer-return negative">-5.4%</span>
+                  </li>
+                  <li class="performer-item">
+                    <div class="performer-info">
+                      <span class="performer-symbol">DEF</span>
+                      <span class="performer-name">DEF Inc.</span>
+                    </div>
+                    <span class="performer-return negative">-3.1%</span>
+                  </li>
+                </ul>
+              </article>
+            </div>
+          </section>
+        </div>
+
+        <!-- Footer -->
+        <footer id="footer-container"></footer>
+      </main>
+    </div>
+
+    <!-- Common Modals -->
+    <div id="modals-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay-container"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script type="module" src="../js/main.js"></script>
+    <script type="module" src="../js/pages/analytics-page.js"></script>
+  </body>
+</html>

@@ -59,25 +59,25 @@ export const portfolioAPI = {
 export const assetAPI = {
   getByPortfolio: (portfolioId) => apiCall(`/assets/portfolio/${portfolioId}`),
   getById: (id) => apiCall(`/assets/${id}`),
-    create: (data) => {
-        const typeMap = {
-            STOCK: "stocks",
-            BOND: "bonds",
-            MUTUAL_FUND: "mutualfunds",
-            SIP: "sips",
-        };
+  create: (data) => {
+    const typeMap = {
+      STOCK: "stocks",
+      BOND: "bonds",
+      MUTUAL_FUND: "mutualfunds",
+      SIP: "sips",
+    };
 
-        const endpoint = typeMap[data.assetType];
-        if (!endpoint) {
-            throw new Error("Unsupported asset type");
-        }
+    const endpoint = typeMap[data.assetType];
+    if (!endpoint) {
+      throw new Error("Unsupported asset type");
+    }
 
-        return apiCall(`/assets/${endpoint}/${data.portfolioId}`, {
-            method: "POST",
-            body: JSON.stringify(data),
-        });
-    },
-    update: (id, data) =>
+    return apiCall(`/assets/${endpoint}/${data.portfolioId}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+  update: (id, data) =>
     apiCall(`/assets/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
@@ -99,12 +99,15 @@ export const assetAPI = {
 export const marketAPI = {
   getStockPrice: (symbol) => apiCall(`/market/stock/${symbol}`),
   getBatchPrices: (symbols) =>
-    apiCall("/market/batch", {
+    apiCall("/market/batch-quotes", {
       method: "POST",
       body: JSON.stringify(symbols),
     }),
-  getExchangeRate: (from, to) => apiCall(`/market/exchange/${from}/${to}`),
+  getExchangeRate: (from, to) =>
+    apiCall(`/market/exchange-rate?from=${from}&to=${to}`),
   getBenchmark: (index) => apiCall(`/market/benchmark/${index}`),
+  searchStocks: (query) =>
+    apiCall(`/market/search?query=${encodeURIComponent(query)}`),
 };
 
 // Report APIs

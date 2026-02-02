@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wishlist - FinBuddy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/analytics-wishlist.css" />
+  </head>
+  <body>
+    <!-- Sidebar Navigation -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Top Navigation Bar -->
+      <div id="navbar-container"></div>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <div class="content-wrapper">
+          <!-- Page Header -->
+          <header class="page-header">
+            <div>
+              <h1 class="page-title">
+                <i class="fas fa-star"></i>
+                Investment Wishlist
+              </h1>
+              <p class="page-subtitle">
+                Track and analyze potential investments before buying
+              </p>
+            </div>
+            <div class="header-actions">
+              <button class="btn-primary" id="addToWishlistBtn">
+                <i class="fas fa-plus"></i> Add to Wishlist
+              </button>
+            </div>
+          </header>
+
+          <!-- Wishlist Summary -->
+          <section class="section-card" aria-labelledby="summary-heading">
+            <div class="wishlist-summary">
+              <article class="summary-item">
+                <div class="summary-icon gradient-blue">
+                  <i class="fas fa-list"></i>
+                </div>
+                <div class="summary-content">
+                  <h2 class="summary-label">Total Watchlist</h2>
+                  <p class="summary-value" id="totalWatchlist">0</p>
+                </div>
+              </article>
+
+              <article class="summary-item">
+                <div class="summary-icon gradient-green">
+                  <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="summary-content">
+                  <h2 class="summary-label">Gainers Today</h2>
+                  <p class="summary-value positive" id="gainersCount">0</p>
+                </div>
+              </article>
+
+              <article class="summary-item">
+                <div class="summary-icon gradient-red">
+                  <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="summary-content">
+                  <h2 class="summary-label">Losers Today</h2>
+                  <p class="summary-value negative" id="losersCount">0</p>
+                </div>
+              </article>
+
+              <article class="summary-item">
+                <div class="summary-icon gradient-orange">
+                  <i class="fas fa-bell"></i>
+                </div>
+                <div class="summary-content">
+                  <h2 class="summary-label">Price Alerts</h2>
+                  <p class="summary-value" id="alertsCount">0</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <!-- Search and Filter -->
+          <section class="section-card">
+            <div class="search-filter-bar">
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input
+                  type="search"
+                  id="wishlistSearch"
+                  placeholder="Search wishlist..."
+                  aria-label="Search wishlist items"
+                />
+              </div>
+              <div class="filter-controls">
+                <select
+                  id="categoryFilter"
+                  class="select-input"
+                  aria-label="Filter by category"
+                >
+                  <option value="all">All Categories</option>
+                  <option value="stocks">Stocks</option>
+                  <option value="bonds">Bonds</option>
+                  <option value="crypto">Cryptocurrency</option>
+                  <option value="etf">ETFs</option>
+                </select>
+                <select
+                  id="sortBy"
+                  class="select-input"
+                  aria-label="Sort wishlist"
+                >
+                  <option value="name">Name (A-Z)</option>
+                  <option value="price">Price</option>
+                  <option value="change">Change %</option>
+                  <option value="added">Date Added</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <!-- Wishlist Items -->
+          <section class="section-card" aria-labelledby="wishlist-heading">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-heart"></i>
+                <h2 id="wishlist-heading">My Watchlist</h2>
+              </div>
+            </div>
+
+            <div class="wishlist-grid" id="wishlistGrid">
+              <!-- Wishlist items will be dynamically loaded -->
+              <article class="wishlist-card">
+                <div class="wishlist-card-header">
+                  <div class="asset-info">
+                    <h3 class="asset-symbol">AAPL</h3>
+                    <p class="asset-name">Apple Inc.</p>
+                    <span class="asset-category">Technology</span>
+                  </div>
+                  <button
+                    class="btn-icon favorite active"
+                    aria-label="Remove from wishlist"
+                  >
+                    <i class="fas fa-star"></i>
+                  </button>
+                </div>
+
+                <div class="wishlist-card-body">
+                  <div class="price-info">
+                    <p class="current-price">$185.25</p>
+                    <span class="price-change positive">
+                      <i class="fas fa-arrow-up"></i> +2.35%
+                    </span>
+                  </div>
+
+                  <div class="price-details">
+                    <div class="detail-item">
+                      <span class="detail-label">Day Range</span>
+                      <span class="detail-value">$182.10 - $186.50</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">52W Range</span>
+                      <span class="detail-value">$142.50 - $195.80</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Market Cap</span>
+                      <span class="detail-value">$2.85T</span>
+                    </div>
+                  </div>
+
+                  <div class="alert-section">
+                    <div class="alert-input">
+                      <label for="appleAlert">
+                        <i class="fas fa-bell"></i> Price Alert
+                      </label>
+                      <input
+                        type="number"
+                        id="appleAlert"
+                        placeholder="Set alert price"
+                        class="input-field"
+                        aria-label="Set price alert for Apple"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="wishlist-card-footer">
+                  <button class="btn-secondary btn-small">
+                    <i class="fas fa-chart-line"></i> View Details
+                  </button>
+                  <button class="btn-primary btn-small">
+                    <i class="fas fa-shopping-cart"></i> Add to Portfolio
+                  </button>
+                </div>
+              </article>
+
+              <article class="wishlist-card">
+                <div class="wishlist-card-header">
+                  <div class="asset-info">
+                    <h3 class="asset-symbol">GOOGL</h3>
+                    <p class="asset-name">Alphabet Inc.</p>
+                    <span class="asset-category">Technology</span>
+                  </div>
+                  <button
+                    class="btn-icon favorite active"
+                    aria-label="Remove from wishlist"
+                  >
+                    <i class="fas fa-star"></i>
+                  </button>
+                </div>
+
+                <div class="wishlist-card-body">
+                  <div class="price-info">
+                    <p class="current-price">$142.80</p>
+                    <span class="price-change negative">
+                      <i class="fas fa-arrow-down"></i> -1.25%
+                    </span>
+                  </div>
+
+                  <div class="price-details">
+                    <div class="detail-item">
+                      <span class="detail-label">Day Range</span>
+                      <span class="detail-value">$141.20 - $144.50</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">52W Range</span>
+                      <span class="detail-value">$102.30 - $155.20</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Market Cap</span>
+                      <span class="detail-value">$1.78T</span>
+                    </div>
+                  </div>
+
+                  <div class="alert-section">
+                    <div class="alert-input">
+                      <label for="googleAlert">
+                        <i class="fas fa-bell"></i> Price Alert
+                      </label>
+                      <input
+                        type="number"
+                        id="googleAlert"
+                        placeholder="Set alert price"
+                        class="input-field"
+                        aria-label="Set price alert for Alphabet"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="wishlist-card-footer">
+                  <button class="btn-secondary btn-small">
+                    <i class="fas fa-chart-line"></i> View Details
+                  </button>
+                  <button class="btn-primary btn-small">
+                    <i class="fas fa-shopping-cart"></i> Add to Portfolio
+                  </button>
+                </div>
+              </article>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyWishlist" style="display: none">
+              <i class="fas fa-star-half-alt"></i>
+              <h3>Your wishlist is empty</h3>
+              <p>
+                Start adding assets you're interested in to track their
+                performance
+              </p>
+              <button class="btn-primary" id="addFirstItem">
+                <i class="fas fa-plus"></i> Add First Item
+              </button>
+            </div>
+          </section>
+
+          <!-- Market Trends -->
+          <section class="section-card" aria-labelledby="trends-heading">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-fire"></i>
+                <h2 id="trends-heading">Trending Assets</h2>
+              </div>
+            </div>
+            <div class="trending-grid">
+              <article class="trending-card">
+                <div class="trending-rank">1</div>
+                <div class="trending-info">
+                  <h3 class="trending-symbol">NVDA</h3>
+                  <p class="trending-name">NVIDIA Corporation</p>
+                </div>
+                <div class="trending-stats">
+                  <span class="trending-price">$512.40</span>
+                  <span class="trending-change positive">+5.8%</span>
+                </div>
+                <button class="btn-icon" aria-label="Add NVIDIA to wishlist">
+                  <i class="far fa-star"></i>
+                </button>
+              </article>
+
+              <article class="trending-card">
+                <div class="trending-rank">2</div>
+                <div class="trending-info">
+                  <h3 class="trending-symbol">TSLA</h3>
+                  <p class="trending-name">Tesla Inc.</p>
+                </div>
+                <div class="trending-stats">
+                  <span class="trending-price">$248.50</span>
+                  <span class="trending-change positive">+3.2%</span>
+                </div>
+                <button class="btn-icon" aria-label="Add Tesla to wishlist">
+                  <i class="far fa-star"></i>
+                </button>
+              </article>
+
+              <article class="trending-card">
+                <div class="trending-rank">3</div>
+                <div class="trending-info">
+                  <h3 class="trending-symbol">META</h3>
+                  <p class="trending-name">Meta Platforms</p>
+                </div>
+                <div class="trending-stats">
+                  <span class="trending-price">$385.20</span>
+                  <span class="trending-change positive">+2.1%</span>
+                </div>
+                <button class="btn-icon" aria-label="Add Meta to wishlist">
+                  <i class="far fa-star"></i>
+                </button>
+              </article>
+            </div>
+          </section>
+        </div>
+
+        <!-- Footer -->
+        <footer id="footer-container"></footer>
+      </main>
+    </div>
+
+    <!-- Add to Wishlist Modal -->
+    <dialog id="addWishlistModal" class="modal" aria-labelledby="modal-title">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modal-title">Add to Wishlist</h2>
+          <button class="modal-close" aria-label="Close modal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="addWishlistForm">
+            <div class="form-group">
+              <label for="symbolInput">Symbol / Ticker</label>
+              <input
+                type="text"
+                id="symbolInput"
+                class="input-field"
+                placeholder="e.g., AAPL, GOOGL, MSFT"
+                required
+                aria-required="true"
+              />
+            </div>
+            <div class="form-group">
+              <label for="categoryInput">Category</label>
+              <select
+                id="categoryInput"
+                class="select-input"
+                required
+                aria-required="true"
+              >
+                <option value="">Select category</option>
+                <option value="stocks">Stocks</option>
+                <option value="bonds">Bonds</option>
+                <option value="crypto">Cryptocurrency</option>
+                <option value="etf">ETFs</option>
+                <option value="mutualfunds">Mutual Funds</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="targetPriceInput">Target Price (Optional)</label>
+              <input
+                type="number"
+                id="targetPriceInput"
+                class="input-field"
+                placeholder="Set target price for alerts"
+                step="0.01"
+              />
+            </div>
+            <div class="form-group">
+              <label for="notesInput">Notes (Optional)</label>
+              <textarea
+                id="notesInput"
+                class="textarea-field"
+                rows="3"
+                placeholder="Add your investment thesis or notes..."
+              ></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelWishlistBtn">
+            Cancel
+          </button>
+          <button type="submit" form="addWishlistForm" class="btn-primary">
+            <i class="fas fa-star"></i> Add to Wishlist
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Common Modals -->
+    <div id="modals-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay-container"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+    <!-- Scripts -->
+    <script type="module" src="../js/main.js"></script>
+    <script type="module" src="../js/pages/wishlist-page.js"></script>
+  </body>
+</html>

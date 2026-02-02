@@ -22,7 +22,8 @@ A comprehensive financial portfolio management system with **Java Spring Boot 3*
 
 - **Real-time Metrics**: Total value, gain/loss, ROI tracking
 - **Interactive Charts**: Allocation pie chart, growth trends, performance bars
-- **Search & Filter**: Quick asset lookup by name or symbol
+- **Global Stock Search**: Real-time search across stocks with debounced results
+- **Multi-Currency Support**: INR (₹) default with USD ($), EUR (€), GBP (£) support
 - **Performance History**: Track portfolio value over time
 
 ### 🔧 Technical Highlights
@@ -212,6 +213,7 @@ GET  /api/market/price/{symbol}                # Get stock price
 POST /api/market/prices/batch                  # Get batch prices
 GET  /api/market/exchange-rate?from=USD&to=EUR # Get exchange rate
 GET  /api/market/benchmark/{symbol}            # Get index value
+GET  /api/market/search?query={term}           # Search stocks
 ```
 
 ### Reports
@@ -225,14 +227,32 @@ GET  /api/reports/portfolio/{portfolioId}/pdf  # Download PDF report
 ### Dashboard Features
 
 1. **Summary Cards**: Total value, investment, gain/loss, asset count
-2. **Asset Allocation Chart**: Pie chart showing distribution by type
-3. **Portfolio Growth Chart**: Line chart tracking value over time
-4. **Performance Chart**: Bar chart of top performing assets
-5. **Asset Table**: Searchable table with CRUD operations
-6. **Wishlist Section**: Sandbox for simulating investments
-7. **Benchmark Comparison**: Compare against S&P 500, NIFTY 50
+2. **Global Search Bar**: Search stocks in real-time with dropdown results (center navbar)
+3. **Currency Selector**: Switch between INR (₹), USD ($), EUR (€), GBP (£) (right navbar)
+4. **Asset Allocation Chart**: Pie chart showing distribution by type
+5. **Portfolio Growth Chart**: Line chart tracking value over time
+6. **Performance Chart**: Bar chart of top performing assets
+7. **Asset Table**: Searchable table with CRUD operations
+8. **Wishlist Section**: Sandbox for simulating investments
+9. **Benchmark Comparison**: Compare against S&P 500, NIFTY 50
 
 ## 💡 Usage Guide
+
+### Currency Selection
+
+1. Default currency is **INR (₹)** - Indian Rupee
+2. Click currency selector in top-right navbar
+3. Choose from: INR, USD, EUR, or GBP
+4. All prices update automatically with correct symbols
+5. Preference saved and persists across sessions
+
+### Global Stock Search
+
+1. Use search bar in center of navbar
+2. Type 2+ characters to search
+3. Results show: Symbol, Company Name, Exchange, Sector, Price
+4. Click any result to view details
+5. Searches across US and Indian markets
 
 ### Create Portfolio
 

@@ -205,6 +205,46 @@ public class StockPriceService {
     }
 
     /**
+     * Get batch detailed quotes with change information
+     */
+    public java.util.List<Map<String, Object>> getBatchDetailedQuotes(java.util.List<String> symbols) {
+        java.util.List<Map<String, Object>> quotes = new java.util.ArrayList<>();
+        for (String symbol : symbols) {
+            Map<String, Object> quote = getDetailedQuote(symbol);
+            // Rename fields to match frontend expectations
+            Map<String, Object> formattedQuote = new HashMap<>();
+            formattedQuote.put("symbol", symbol);
+            formattedQuote.put("name", getCompanyName(symbol));
+            formattedQuote.put("price", quote.get("currentPrice"));
+            formattedQuote.put("change", quote.get("change"));
+            formattedQuote.put("changePercent", quote.get("changePercent"));
+            formattedQuote.put("timestamp", quote.get("timestamp"));
+            quotes.add(formattedQuote);
+        }
+        return quotes;
+    }
+
+    /**
+     * Get company name from symbol (mock implementation)
+     */
+    private String getCompanyName(String symbol) {
+        // Map common symbols to company names
+        Map<String, String> companyNames = new HashMap<>();
+        companyNames.put("AAPL", "Apple Inc.");
+        companyNames.put("GOOGL", "Alphabet Inc.");
+        companyNames.put("MSFT", "Microsoft Corporation");
+        companyNames.put("AMZN", "Amazon.com Inc.");
+        companyNames.put("TSLA", "Tesla Inc.");
+        companyNames.put("META", "Meta Platforms Inc.");
+        companyNames.put("NVDA", "NVIDIA Corporation");
+        companyNames.put("JPM", "JPMorgan Chase & Co.");
+        companyNames.put("V", "Visa Inc.");
+        companyNames.put("WMT", "Walmart Inc.");
+
+        return companyNames.getOrDefault(symbol, symbol + " Inc.");
+    }
+
+    /**
      * Mock price generator for demo purposes
      * Generates realistic stock prices with daily variation
      */
@@ -265,6 +305,29 @@ public class StockPriceService {
     }
 
     /**
+     * Get benchmark index with change information
+     */
+    public Map<String, Object> getBenchmarkWithChange(String indexSymbol) {
+        Map<String, Object> benchmark = new HashMap<>();
+
+        BigDecimal currentValue = getBenchmarkValue(indexSymbol);
+        // Mock change data - in production, this would come from the API
+        BigDecimal previousClose = currentValue.multiply(BigDecimal.valueOf(0.995)); // Mock 0.5% change
+        BigDecimal change = currentValue.subtract(previousClose);
+        BigDecimal changePercent = change.divide(previousClose, 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+
+        benchmark.put("symbol", indexSymbol);
+        benchmark.put("value", currentValue);
+        benchmark.put("previousClose", previousClose);
+        benchmark.put("change", change);
+        benchmark.put("changePercent", changePercent);
+        benchmark.put("timestamp", System.currentTimeMillis());
+
+        return benchmark;
+    }
+
+    /**
      * Get detailed quote information including price change
      */
     public Map<String, Object> getDetailedQuote(String symbol) {
@@ -292,6 +355,71 @@ public class StockPriceService {
     public void clearCache() {
         priceCache.clear();
         log.info("Price cache cleared");
+    }
+
+    /**
+     * Search for stocks by symbol or name
+     */
+    public java.util.List<Map<String, Object>> searchStocks(String query) {
+        java.util.List<Map<String, Object>> results = new java.util.ArrayList<>();
+
+        // Mock stock database - in production, this would query a real database or API
+        String[][] stockDatabase = {
+                { "AAPL", "Apple Inc.", "Technology", "NASDAQ" },
+                { "GOOGL", "Alphabet Inc.", "Technology", "NASDAQ" },
+                { "MSFT", "Microsoft Corporation", "Technology", "NASDAQ" },
+                { "AMZN", "Amazon.com Inc.", "E-Commerce", "NASDAQ" },
+                { "TSLA", "Tesla Inc.", "Automotive", "NASDAQ" },
+                { "META", "Meta Platforms Inc.", "Technology", "NASDAQ" },
+                { "NVDA", "NVIDIA Corporation", "Technology", "NASDAQ" },
+                { "JPM", "JPMorgan Chase & Co.", "Banking", "NYSE" },
+                { "V", "Visa Inc.", "Finance", "NYSE" },
+                { "WMT", "Walmart Inc.", "Retail", "NYSE" },
+                { "TCS", "Tata Consultancy Services", "IT Services", "NSE" },
+                { "INFY", "Infosys Ltd.", "IT Services", "NSE" },
+                { "RELIANCE", "Reliance Industries", "Conglomerate", "NSE" },
+                { "HDFCBANK", "HDFC Bank", "Banking", "NSE" },
+                { "ICICIBANK", "ICICI Bank", "Banking", "NSE" },
+                { "ITC", "ITC Limited", "FMCG", "NSE" },
+                { "SBIN", "State Bank of India", "Banking", "NSE" },
+                { "BHARTIARTL", "Bharti Airtel", "Telecom", "NSE" },
+                { "KOTAKBANK", "Kotak Mahindra Bank", "Banking", "NSE" },
+                { "HINDUNILVR", "Hindustan Unilever", "FMCG", "NSE" }
+        };
+
+        String searchQuery = query.toLowerCase().trim();
+
+        for (String[] stock : stockDatabase) {
+            String symbol = stock[0];
+            String name = stock[1];
+            String sector = stock[2];
+            String exchange = stock[3];
+
+            // Search by symbol or name
+            if (symbol.toLowerCase().contains(searchQuery) ||
+                    name.toLowerCase().contains(searchQuery) ||
+                    sector.toLowerCase().contains(searchQuery)) {
+
+                BigDecimal price = getRealTimePrice(symbol);
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("symbol", symbol);
+                result.put("name", name);
+                result.put("sector", sector);
+                result.put("exchange", exchange);
+                result.put("price", price);
+                result.put("currency", exchange.equals("NSE") ? "INR" : "USD");
+
+                results.add(result);
+
+                // Limit to 10 results
+                if (results.size() >= 10) {
+                    break;
+                }
+            }
+        }
+
+        return results;
     }
 
     /**

@@ -118,11 +118,49 @@ function setupPortfolioSelector() {
 }
 
 // Format Currency
-export function formatCurrency(amount, currency = "USD") {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency,
-  }).format(amount);
+export function formatCurrency(amount, currency = null) {
+  // Get currency from localStorage if not specified
+  if (!currency) {
+    currency = localStorage.getItem("preferredCurrency") || "INR";
+  }
+
+  const currencySymbols = {
+    INR: "₹",
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
+  };
+
+  const symbol = currencySymbols[currency] || currency;
+  const locale = currency === "INR" ? "en-IN" : "en-US";
+
+  return `${symbol}${parseFloat(amount).toLocaleString(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+// Convert currency
+export async function convertCurrency(amount, fromCurrency, toCurrency) {
+  if (fromCurrency === toCurrency) {
+    return amount;
+  }
+
+  try {
+    const response = await fetch(
+      `http://localhost:8081/api/market/exchange-rate?from=${fromCurrency}&to=${toCurrency}`,
+    );
+    const data = await response.json();
+    return amount * data.rate;
+  } catch (error) {
+    console.error("Currency conversion error:", error);
+    return amount;
+  }
+}
+
+// Get current currency
+export function getCurrentCurrency() {
+  return localStorage.getItem("preferredCurrency") || "INR";
 }
 
 // Format Number

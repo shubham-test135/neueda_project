@@ -80,7 +80,6 @@ class PDFReportServiceTest {
         dashboardSummary.setTotalInvestment(new BigDecimal("8000.00"));
         dashboardSummary.setTotalGainLoss(new BigDecimal("2000.00"));
         dashboardSummary.setGainLossPercentage(new BigDecimal("25.00"));
-        dashboardSummary.setTotalAssets(1);
     }
 
     @Test
@@ -119,7 +118,6 @@ class PDFReportServiceTest {
     void shouldGeneratePdfWithEmptyAssetsList() {
         // Arrange
         testPortfolio.setAssets(new ArrayList<>());
-        dashboardSummary.setTotalAssets(0);
 
         when(portfolioService.getPortfolioWithAssets(1L)).thenReturn(Optional.of(testPortfolio));
         when(portfolioService.getDashboardSummary(1L)).thenReturn(dashboardSummary);
@@ -150,8 +148,6 @@ class PDFReportServiceTest {
         stock2.setCurrency("USD");
         stock2.setPurchaseDate(LocalDate.now().minusMonths(3));
         testAssets.add(stock2);
-
-        dashboardSummary.setTotalAssets(2);
 
         when(portfolioService.getPortfolioWithAssets(1L)).thenReturn(Optional.of(testPortfolio));
         when(portfolioService.getDashboardSummary(1L)).thenReturn(dashboardSummary);
