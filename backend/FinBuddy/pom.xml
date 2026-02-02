@@ -98,6 +98,20 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite</artifactId>
+			<version>1.10.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JUnit Jupiter (if you're using JUnit 5 tests) -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.10.1</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

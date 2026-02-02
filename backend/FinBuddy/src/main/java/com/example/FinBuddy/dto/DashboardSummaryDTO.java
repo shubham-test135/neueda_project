@@ -21,6 +21,7 @@ public class DashboardSummaryDTO {
     private BigDecimal totalGainLoss;
     private BigDecimal gainLossPercentage;
     private String baseCurrency;
+    private BigDecimal totalAssets;
 
     // Asset allocation breakdown
     private Map<String, AssetAllocationDTO> assetAllocation;
@@ -31,4 +32,6 @@ public class DashboardSummaryDTO {
     // Recent transactions count
     private Integer assetCount;
     private Integer wishlistCount;
+
+
 }

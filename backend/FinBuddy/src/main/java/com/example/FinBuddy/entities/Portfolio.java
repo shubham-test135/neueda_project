@@ -1,5 +1,6 @@
 package com.example.FinBuddy.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -60,6 +61,10 @@ public class Portfolio {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
+    private User user;
 
     /**
      * Recalculates portfolio metrics based on assets
