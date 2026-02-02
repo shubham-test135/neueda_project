@@ -59,12 +59,25 @@ export const portfolioAPI = {
 export const assetAPI = {
   getByPortfolio: (portfolioId) => apiCall(`/assets/portfolio/${portfolioId}`),
   getById: (id) => apiCall(`/assets/${id}`),
-  create: (data) =>
-    apiCall("/assets", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-  update: (id, data) =>
+    create: (data) => {
+        const typeMap = {
+            STOCK: "stocks",
+            BOND: "bonds",
+            MUTUAL_FUND: "mutualfunds",
+            SIP: "sips",
+        };
+
+        const endpoint = typeMap[data.assetType];
+        if (!endpoint) {
+            throw new Error("Unsupported asset type");
+        }
+
+        return apiCall(`/assets/${endpoint}/${data.portfolioId}`, {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+    },
+    update: (id, data) =>
     apiCall(`/assets/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
@@ -97,7 +110,7 @@ export const marketAPI = {
 // Report APIs
 export const reportAPI = {
   downloadPDF: async (portfolioId) => {
-    const url = `${API_BASE_URL}/reports/pdf/${portfolioId}`;
+    const url = `${API_BASE_URL}/reports/portfolio/${portfolioId}/pdf`;
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to download PDF");
     const blob = await response.blob();

@@ -14,7 +14,7 @@ let performanceChart = null;
 
 // Initialize Dashboard
 document.addEventListener("DOMContentLoaded", () => {
-  loadPortfolios();
+  loadPortfolios().then(r => console.log(r));
   setupEventListeners();
   loadBenchmarks();
 });
@@ -79,6 +79,7 @@ async function loadPortfolios() {
   try {
     const response = await fetch(`${API_BASE_URL}/portfolios`);
     const portfolios = await response.json();
+    console.log(portfolios);
 
     const select = document.getElementById("portfolioSelect");
     select.innerHTML = '<option value="">-- Select a Portfolio --</option>';
@@ -93,7 +94,7 @@ async function loadPortfolios() {
     // Auto-select first portfolio if available
     if (portfolios.length > 0) {
       select.value = portfolios[0].id;
-      handlePortfolioChange();
+      await handlePortfolioChange();
     }
   } catch (error) {
     console.error("Error loading portfolios:", error);

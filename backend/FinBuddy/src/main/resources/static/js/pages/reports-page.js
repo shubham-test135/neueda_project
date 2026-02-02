@@ -4,10 +4,12 @@
 
 import { reportAPI } from "../utils/api.js";
 import { showToast, showLoading, hideLoading } from "../utils/ui.js";
+import {initGlobalNavbar} from "../navbar.js";
 
 let currentPortfolioId = null;
 
 async function initReportsPage() {
+  initGlobalNavbar();
   setupEventListeners();
   window.addEventListener("portfolioChanged", handlePortfolioChange);
 }

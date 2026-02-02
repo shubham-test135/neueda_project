@@ -2,7 +2,9 @@
 // Assets Page Logic
 // ============================================
 
-import { assetAPI } from "../utils/api.js";
+import { assetAPI, portfolioAPI } from "../utils/api.js";
+import {initGlobalNavbar} from "../navbar.js";
+
 import {
   showToast,
   showLoading,
@@ -13,9 +15,11 @@ import {
 
 let currentPortfolioId = null;
 
-async function initAssetsPage() {
-  setupEventListeners();
 
+
+async function initAssetsPage() {
+  initGlobalNavbar();
+  setupEventListeners();
   // Listen for portfolio changes
   window.addEventListener("portfolioChanged", handlePortfolioChange);
 }

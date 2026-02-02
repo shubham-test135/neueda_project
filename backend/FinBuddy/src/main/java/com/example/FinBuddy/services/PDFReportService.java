@@ -128,12 +128,13 @@ public class PDFReportService {
         table.addHeaderCell("Percentage");
         table.addHeaderCell("Count");
 
-        dashboard.getAssetAllocation().forEach((type, allocation) -> {
-            table.addCell(type);
+        dashboard.getAssetAllocation().forEach(allocation -> {
+            table.addCell(allocation.getAssetType());
             table.addCell(dashboard.getBaseCurrency() + " " + allocation.getTotalValue());
             table.addCell(allocation.getPercentage() + "%");
             table.addCell(String.valueOf(allocation.getCount()));
         });
+
 
         document.add(table);
         document.add(new Paragraph("\n"));

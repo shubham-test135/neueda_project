@@ -4,11 +4,13 @@
 
 import { assetAPI, marketAPI } from "../utils/api.js";
 import { showToast, formatCurrency } from "../utils/ui.js";
+import {initGlobalNavbar} from "../navbar.js";
 
 let currentPortfolioId = null;
 let priceUpdateInterval = null;
 
 async function initMarketPage() {
+  initGlobalNavbar();
   window.addEventListener("portfolioChanged", handlePortfolioChange);
   startAutoRefresh();
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,7 +24,7 @@ public class DashboardSummaryDTO {
     private String baseCurrency;
 
     // Asset allocation breakdown
-    private Map<String, AssetAllocationDTO> assetAllocation;
+    private List<AssetAllocationDTO> assetAllocation;
 
     // Top performing assets
     private java.util.List<AssetPerformanceDTO> topPerformers;

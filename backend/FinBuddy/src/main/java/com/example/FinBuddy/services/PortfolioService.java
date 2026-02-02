@@ -159,8 +159,7 @@ public class PortfolioService {
     /**
      * Calculate asset allocation by type
      */
-    private Map<String, AssetAllocationDTO> calculateAssetAllocation(List<Asset> assets) {
-        // Filter out wishlist items for allocation
+    private List<AssetAllocationDTO> calculateAssetAllocation(List<Asset> assets) {
         List<Asset> investedAssets = assets.stream()
                 .filter(a -> !a.getIsWishlist())
                 .collect(Collectors.toList());
@@ -169,34 +168,33 @@ public class PortfolioService {
                 .map(Asset::getCurrentValue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        Map<String, AssetAllocationDTO> allocation = new HashMap<>();
+        if (totalValue.compareTo(BigDecimal.ZERO) == 0) {
+            return Collections.emptyList();
+        }
 
-        // Group by asset type
-        Map<String, List<Asset>> groupedAssets = investedAssets.stream()
-                .collect(Collectors.groupingBy(Asset::getAssetType));
+        return investedAssets.stream()
+                .collect(Collectors.groupingBy(Asset::getAssetType))
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    BigDecimal typeValue = entry.getValue().stream()
+                            .map(Asset::getCurrentValue)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        groupedAssets.forEach((type, assetList) -> {
-            BigDecimal typeValue = assetList.stream()
-                    .map(Asset::getCurrentValue)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    AssetAllocationDTO dto = new AssetAllocationDTO();
+                    dto.setAssetType(entry.getKey());
+                    dto.setTotalValue(typeValue);
+                    dto.setPercentage(
+                            typeValue.divide(totalValue, 4, RoundingMode.HALF_UP)
+                                    .multiply(BigDecimal.valueOf(100))
+                    );
+                    dto.setCount(entry.getValue().size());
 
-            BigDecimal percentage = BigDecimal.ZERO;
-            if (totalValue.compareTo(BigDecimal.ZERO) > 0) {
-                percentage = typeValue.divide(totalValue, 4, RoundingMode.HALF_UP)
-                        .multiply(new BigDecimal("100"));
-            }
-
-            AssetAllocationDTO dto = new AssetAllocationDTO();
-            dto.setAssetType(type);
-            dto.setTotalValue(typeValue);
-            dto.setPercentage(percentage);
-            dto.setCount(assetList.size());
-
-            allocation.put(type, dto);
-        });
-
-        return allocation;
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
+
 
     /**
      * Get top performing assets

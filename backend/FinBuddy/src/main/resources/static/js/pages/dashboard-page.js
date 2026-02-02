@@ -10,14 +10,16 @@ import {
   formatCurrency,
   formatPercentage,
 } from "../utils/ui.js";
+import {initGlobalNavbar} from "../navbar.js";
 
 let currentPortfolioId = null;
 let charts = {};
 
 // Initialize dashboard
 async function initDashboard() {
+  // initGlobalNavbar();
+  loadPortfolios();
   setupEventListeners();
-  await loadPortfolios();
 
   // Listen for portfolio changes
   window.addEventListener("portfolioChanged", handlePortfolioChange);
@@ -75,6 +77,10 @@ async function loadDashboardData(portfolioId) {
   showLoading();
   try {
     const dashboard = await portfolioAPI.getDashboard(portfolioId);
+
+    console.log("FULL DASHBOARD:", dashboard);
+    console.log("ASSET ALLOCATION:", dashboard.assetAllocation);
+
     updateSummaryCards(dashboard);
     updateCharts(dashboard);
     updateBenchmarks(portfolioId);
@@ -85,6 +91,7 @@ async function loadDashboardData(portfolioId) {
     hideLoading();
   }
 }
+
 
 function updateSummaryCards(dashboard) {
   document.getElementById("totalValue").textContent = formatCurrency(
@@ -106,7 +113,7 @@ function updateSummaryCards(dashboard) {
   gainLossPercent.className = `card-percentage ${gainLossPercentValue >= 0 ? "positive" : "negative"}`;
 
   document.getElementById("assetCount").textContent =
-    dashboard.totalAssets || 0;
+    dashboard.assetCount || 0;
 }
 
 function updateCharts(dashboard) {
