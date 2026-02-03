@@ -711,7 +711,7 @@
   padding: var(--spacing-lg);
   background: var(--bg-primary);
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   border-top: 1px solid var(--border-color);
 }
 
@@ -719,6 +719,40 @@
   padding: var(--spacing-sm) var(--spacing-md);
   font-size: 0.875rem;
   flex: 1;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.wishlist-card-footer .btn-secondary {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.wishlist-card-footer .btn-secondary:hover {
+  background: var(--border-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.wishlist-card-footer .btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--primary-dark) 100%
+  );
+  border: none;
+  color: white;
+}
+
+.wishlist-card-footer .btn-primary:hover {
+  background: linear-gradient(
+    135deg,
+    var(--primary-dark) 0%,
+    var(--primary) 100%
+  );
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 /* Trending Assets */

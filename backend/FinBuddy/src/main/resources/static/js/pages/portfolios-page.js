@@ -143,6 +143,12 @@ async function handleCreatePortfolio(e) {
 
     // Reload portfolios
     await loadPortfolios();
+
+    // Refresh navbar dropdown
+    if (typeof window.refreshPortfolioDropdown === "function") {
+      await window.refreshPortfolioDropdown();
+    }
+
     hideLoading();
   } catch (error) {
     console.error("Error creating portfolio:", error);

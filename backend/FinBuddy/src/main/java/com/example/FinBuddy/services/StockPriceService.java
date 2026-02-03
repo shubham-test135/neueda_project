@@ -295,13 +295,57 @@ public class StockPriceService {
      * Get benchmark index value (S&P 500, NIFTY 50, etc.)
      */
     public BigDecimal getBenchmarkValue(String indexSymbol) {
-        Map<String, BigDecimal> mockIndexValues = new HashMap<>();
-        mockIndexValues.put("^GSPC", new BigDecimal("4783.45")); // S&P 500
-        mockIndexValues.put("^NSEI", new BigDecimal("21731.40")); // NIFTY 50
-        mockIndexValues.put("^DJI", new BigDecimal("37305.16")); // Dow Jones
-        mockIndexValues.put("^IXIC", new BigDecimal("14813.92")); // NASDAQ
+        // Map friendly names to actual ticker symbols
+        Map<String, String> symbolMapping = new HashMap<>();
+        symbolMapping.put("SP500", "^GSPC");
+        symbolMapping.put("NIFTY50", "^NSEI");
+        symbolMapping.put("DJI", "^DJI");
+        symbolMapping.put("NASDAQ", "^IXIC");
 
-        return mockIndexValues.getOrDefault(indexSymbol, BigDecimal.ZERO);
+        // Convert friendly name to ticker symbol if needed
+        String actualSymbol = symbolMapping.getOrDefault(indexSymbol, indexSymbol);
+
+        try {
+            // Check cache first
+            CachedPrice cached = priceCache.get(actualSymbol);
+            if (cached != null && !cached.isExpired()) {
+                log.debug("Returning cached index value for {}: {}", actualSymbol, cached.price);
+                return cached.price;
+            }
+
+            if (apiEnabled && !"demo".equals(apiKey)) {
+                // Fetch from Finnhub API
+                BigDecimal realValue = fetchFromFinnhub(actualSymbol);
+                if (realValue != null && realValue.compareTo(BigDecimal.ZERO) > 0) {
+                    priceCache.put(actualSymbol, new CachedPrice(realValue));
+                    return realValue;
+                }
+            }
+
+            // Fallback to mock values if API is disabled or fails
+            log.debug("Using fallback mock data for index: {}", actualSymbol);
+            Map<String, BigDecimal> mockIndexValues = new HashMap<>();
+            mockIndexValues.put("^GSPC", new BigDecimal("4783.45")); // S&P 500
+            mockIndexValues.put("^NSEI", new BigDecimal("21731.40")); // NIFTY 50
+            mockIndexValues.put("^DJI", new BigDecimal("37305.16")); // Dow Jones
+            mockIndexValues.put("^IXIC", new BigDecimal("14813.92")); // NASDAQ
+
+            BigDecimal fallbackValue = mockIndexValues.getOrDefault(actualSymbol, BigDecimal.ZERO);
+            if (fallbackValue.compareTo(BigDecimal.ZERO) > 0) {
+                priceCache.put(actualSymbol, new CachedPrice(fallbackValue));
+            }
+            return fallbackValue;
+
+        } catch (Exception e) {
+            log.error("Error fetching index value for {}: {}", actualSymbol, e.getMessage());
+            // Return fallback value
+            Map<String, BigDecimal> mockIndexValues = new HashMap<>();
+            mockIndexValues.put("^GSPC", new BigDecimal("4783.45"));
+            mockIndexValues.put("^NSEI", new BigDecimal("21731.40"));
+            mockIndexValues.put("^DJI", new BigDecimal("37305.16"));
+            mockIndexValues.put("^IXIC", new BigDecimal("14813.92"));
+            return mockIndexValues.getOrDefault(actualSymbol, BigDecimal.ZERO);
+        }
     }
 
     /**
@@ -310,19 +354,42 @@ public class StockPriceService {
     public Map<String, Object> getBenchmarkWithChange(String indexSymbol) {
         Map<String, Object> benchmark = new HashMap<>();
 
-        BigDecimal currentValue = getBenchmarkValue(indexSymbol);
-        // Mock change data - in production, this would come from the API
-        BigDecimal previousClose = currentValue.multiply(BigDecimal.valueOf(0.995)); // Mock 0.5% change
-        BigDecimal change = currentValue.subtract(previousClose);
-        BigDecimal changePercent = change.divide(previousClose, 4, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
+        // Map friendly names to actual ticker symbols
+        Map<String, String> symbolMapping = new HashMap<>();
+        symbolMapping.put("SP500", "^GSPC");
+        symbolMapping.put("NIFTY50", "^NSEI");
+        symbolMapping.put("DJI", "^DJI");
+        symbolMapping.put("NASDAQ", "^IXIC");
 
-        benchmark.put("symbol", indexSymbol);
-        benchmark.put("value", currentValue);
-        benchmark.put("previousClose", previousClose);
-        benchmark.put("change", change);
-        benchmark.put("changePercent", changePercent);
-        benchmark.put("timestamp", System.currentTimeMillis());
+        String actualSymbol = symbolMapping.getOrDefault(indexSymbol, indexSymbol);
+
+        try {
+            // Fetch detailed quote from Finnhub for real change data
+            Map<String, Object> quote = getDetailedQuote(actualSymbol);
+
+            benchmark.put("symbol", indexSymbol);
+            benchmark.put("value", quote.get("currentPrice"));
+            benchmark.put("previousClose", quote.get("previousClose"));
+            benchmark.put("change", quote.get("change"));
+            benchmark.put("changePercent", quote.get("changePercent"));
+            benchmark.put("timestamp", quote.get("timestamp"));
+
+        } catch (Exception e) {
+            log.error("Error fetching benchmark with change for {}: {}", indexSymbol, e.getMessage());
+            // Fallback to simple calculation
+            BigDecimal currentValue = getBenchmarkValue(indexSymbol);
+            BigDecimal previousClose = currentValue.multiply(BigDecimal.valueOf(0.995));
+            BigDecimal change = currentValue.subtract(previousClose);
+            BigDecimal changePercent = change.divide(previousClose, 4, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+
+            benchmark.put("symbol", indexSymbol);
+            benchmark.put("value", currentValue);
+            benchmark.put("previousClose", previousClose);
+            benchmark.put("change", change);
+            benchmark.put("changePercent", changePercent);
+            benchmark.put("timestamp", System.currentTimeMillis());
+        }
 
         return benchmark;
     }

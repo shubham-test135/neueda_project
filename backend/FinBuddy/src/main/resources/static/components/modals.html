@@ -51,3 +51,131 @@
     </form>
   </div>
 </div>
+<!-- Stock Details Modal -->
+<div id="stockDetailsModal" class="modal">
+  <div class="modal-content modal-modern">
+    <div class="modal-header">
+      <h2><i class="fas fa-chart-line"></i> Stock Details</h2>
+      <button class="modal-close" id="closeStockDetailsModal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div
+        class="stock-details-loading"
+        style="display: none; text-align: center; padding: 20px"
+      >
+        <i class="fas fa-spinner fa-spin fa-2x"></i>
+        <p>Loading stock details...</p>
+      </div>
+      <div class="stock-details-content">
+        <div class="stock-header" style="margin-bottom: 20px">
+          <h3
+            id="stockSymbol"
+            style="margin: 0; color: var(--primary-color)"
+          ></h3>
+          <p
+            id="stockDescription"
+            style="margin: 5px 0; color: var(--text-secondary)"
+          ></p>
+        </div>
+
+        <div
+          class="stock-price-info"
+          style="
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+          "
+        >
+          <div
+            class="info-card"
+            style="
+              background: var(--bg-secondary);
+              padding: 15px;
+              border-radius: 8px;
+            "
+          >
+            <label style="font-size: 0.875rem; color: var(--text-secondary)"
+              >Current Price</label
+            >
+            <div
+              id="stockPrice"
+              style="
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: var(--primary-color);
+              "
+            ></div>
+          </div>
+          <div
+            class="info-card"
+            style="
+              background: var(--bg-secondary);
+              padding: 15px;
+              border-radius: 8px;
+            "
+          >
+            <label style="font-size: 0.875rem; color: var(--text-secondary)"
+              >Change</label
+            >
+            <div
+              id="stockChange"
+              style="font-size: 1.5rem; font-weight: bold"
+            ></div>
+          </div>
+          <div
+            class="info-card"
+            style="
+              background: var(--bg-secondary);
+              padding: 15px;
+              border-radius: 8px;
+            "
+          >
+            <label style="font-size: 0.875rem; color: var(--text-secondary)"
+              >Previous Close</label
+            >
+            <div
+              id="stockPreviousClose"
+              style="font-size: 1.25rem; font-weight: 600"
+            ></div>
+          </div>
+          <div
+            class="info-card"
+            style="
+              background: var(--bg-secondary);
+              padding: 15px;
+              border-radius: 8px;
+            "
+          >
+            <label style="font-size: 0.875rem; color: var(--text-secondary)"
+              >Change %</label
+            >
+            <div
+              id="stockChangePercent"
+              style="font-size: 1.25rem; font-weight: 600"
+            ></div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="stock-details-error"
+        style="
+          display: none;
+          text-align: center;
+          padding: 20px;
+          color: var(--danger-color);
+        "
+      >
+        <i class="fas fa-exclamation-circle fa-2x"></i>
+        <p>Failed to load stock details. Please try again.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary close-modal">
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+  </div>
+</div>

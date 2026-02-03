@@ -327,14 +327,99 @@ function sortWishlist() {
   renderWishlist();
 }
 
-function viewDetails(symbol) {
-  showToast(`Viewing details for ${symbol}`, "info");
-  // Navigate to details page or show modal
+async function viewDetails(symbol) {
+  const modal = document.getElementById("stockDetailsModal");
+  const loading = modal.querySelector(".stock-details-loading");
+  const content = modal.querySelector(".stock-details-content");
+  const error = modal.querySelector(".stock-details-error");
+
+  // Setup close handlers
+  setupModalCloseHandlers(modal);
+
+  // Show modal and loading state
+  modal.style.display = "flex";
+  modal.classList.add("active");
+  loading.style.display = "block";
+  content.style.display = "none";
+  error.style.display = "none";
+
+  try {
+    // Fetch stock details from backend
+    const response = await fetch(`/api/market/quote/${symbol}`);
+    const data = await response.json();
+
+    // Update modal content
+    document.getElementById("stockSymbol").textContent = data.symbol || symbol;
+
+    // Find the stock in wishlist for description
+    const stockInfo = wishlistItems.find((item) => item.symbol === symbol);
+    document.getElementById("stockDescription").textContent =
+      stockInfo?.name || "Stock Information";
+
+    document.getElementById("stockPrice").textContent = formatCurrency(
+      data.currentPrice,
+    );
+    document.getElementById("stockPreviousClose").textContent = formatCurrency(
+      data.previousClose,
+    );
+
+    const change = data.change || 0;
+    const changePercent = data.changePercent || 0;
+    const changeColor =
+      change >= 0 ? "var(--success-color)" : "var(--danger-color)";
+    const changeIcon = change >= 0 ? "▲" : "▼";
+
+    document.getElementById("stockChange").innerHTML =
+      `<span style="color: ${changeColor}">${changeIcon} ${formatCurrency(Math.abs(change))}</span>`;
+    document.getElementById("stockChangePercent").innerHTML =
+      `<span style="color: ${changeColor}">${changeIcon} ${Math.abs(changePercent).toFixed(2)}%</span>`;
+
+    // Hide loading, show content
+    loading.style.display = "none";
+    content.style.display = "block";
+  } catch (err) {
+    console.error("Failed to load stock details:", err);
+    loading.style.display = "none";
+    error.style.display = "block";
+  }
+}
+
+// Setup modal close handlers
+function setupModalCloseHandlers(modal) {
+  if (!modal || modal.dataset.closeHandlersSetup) return;
+  modal.dataset.closeHandlersSetup = "true";
+
+  const closeBtn = document.getElementById("closeStockDetailsModal");
+
+  if (closeBtn) {
+    closeBtn.onclick = () => {
+      modal.style.display = "none";
+      modal.classList.remove("active");
+    };
+  }
+
+  // Close modal when clicking outside
+  modal.onclick = (e) => {
+    if (e.target === modal) {
+      modal.style.display = "none";
+      modal.classList.remove("active");
+    }
+  };
+
+  // Close modal with close-modal class buttons
+  modal.querySelectorAll(".close-modal").forEach((btn) => {
+    btn.onclick = () => {
+      modal.style.display = "none";
+      modal.classList.remove("active");
+    };
+  });
 }
 
 function addToPortfolio(symbol) {
-  showToast(`Add ${symbol} to portfolio feature coming soon!`, "info");
-  // Navigate to add asset page
+  // Store the symbol to pre-fill the asset form
+  sessionStorage.setItem("prefill_symbol", symbol);
+  // Navigate to assets page
+  window.location.href = "/pages/assets.html";
 }
 
 // Make functions global for onclick handlers

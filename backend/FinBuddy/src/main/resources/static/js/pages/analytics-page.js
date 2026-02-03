@@ -49,6 +49,7 @@ async function loadAnalyticsData(portfolioId) {
     ]);
 
     updatePerformanceMetrics(dashboard);
+    updatePerformanceChart(dashboard.performanceData);
     updateAllocationChart(assets);
     updateTopPerformers(assets);
     updateRiskMetrics(dashboard);
@@ -59,25 +60,22 @@ async function loadAnalyticsData(portfolioId) {
 }
 
 function updatePerformanceMetrics(dashboard) {
-  // Total Returns
-  const totalReturns = dashboard.totalValue - dashboard.totalInvestedAmount;
+  // Total Returns with safety checks
+  const totalValue = dashboard.totalValue || 0;
+  const totalInvestedAmount = dashboard.totalInvestedAmount || 0;
+  const totalReturns = totalValue - totalInvestedAmount;
+
   document.getElementById("totalReturns").textContent =
     formatCurrency(totalReturns);
 
   const returnsChange = document.getElementById("returnsChange");
   const returnsPct =
-    dashboard.totalInvestedAmount > 0
-      ? (totalReturns / dashboard.totalInvestedAmount) * 100
-      : 0;
+    totalInvestedAmount > 0 ? (totalReturns / totalInvestedAmount) * 100 : 0;
   returnsChange.textContent = `${returnsPct >= 0 ? "+" : ""}${returnsPct.toFixed(2)}%`;
   returnsChange.className = `metric-change ${returnsPct >= 0 ? "positive" : "negative"}`;
 
   // CAGR (mock calculation - should be from backend)
-  const cagr = calculateCAGR(
-    dashboard.totalInvestedAmount,
-    dashboard.totalValue,
-    1,
-  );
+  const cagr = calculateCAGR(totalInvestedAmount, totalValue, 1);
   document.getElementById("cagrValue").textContent = `${cagr.toFixed(2)}%`;
 
   // Volatility (mock)
@@ -90,6 +88,34 @@ function updatePerformanceMetrics(dashboard) {
 function calculateCAGR(initialValue, finalValue, years) {
   if (initialValue <= 0 || years <= 0) return 0;
   return (Math.pow(finalValue / initialValue, 1 / years) - 1) * 100;
+}
+
+function updatePerformanceChart(performanceData) {
+  if (!performanceChart || !performanceData) return;
+
+  // Update the chart with real data
+  const portfolioValues = performanceData.values || [];
+  const dates = performanceData.dates || [];
+
+  // Calculate percentage returns from first value
+  const firstValue = portfolioValues[0] || 100;
+  const portfolioReturns = portfolioValues.map(
+    (val) => ((val - firstValue) / firstValue) * 100,
+  );
+
+  // Generate mock benchmark data based on portfolio returns (in production, fetch real benchmark data)
+  const sp500Returns = portfolioReturns.map(
+    (val, idx) => val * 0.85 + (Math.random() - 0.5) * 2,
+  );
+  const nasdaqReturns = portfolioReturns.map(
+    (val, idx) => val * 1.1 + (Math.random() - 0.5) * 3,
+  );
+
+  performanceChart.data.labels = dates;
+  performanceChart.data.datasets[0].data = portfolioReturns;
+  performanceChart.data.datasets[1].data = sp500Returns;
+  performanceChart.data.datasets[2].data = nasdaqReturns;
+  performanceChart.update();
 }
 
 function initCharts() {

@@ -3,7 +3,7 @@
 // ============================================
 
 import { assetAPI, portfolioAPI } from "../utils/api.js";
-import {initGlobalNavbar} from "../navbar.js";
+import { initGlobalNavbar, getCurrentCurrency } from "../navbar.js";
 
 import {
   showToast,
@@ -11,15 +11,39 @@ import {
   hideLoading,
   formatCurrency,
   formatPercentage,
+  debounce,
 } from "../utils/ui.js";
 
 let currentPortfolioId = null;
-
-
+const FINNHUB_API_KEY = "d5vg7hpr01qjj9jjd8k0d5vg7hpr01qjj9jjd8kg";
 
 async function initAssetsPage() {
   initGlobalNavbar();
   setupEventListeners();
+
+  // Check if there's a prefilled symbol from wishlist
+  const prefillSymbol = sessionStorage.getItem("prefill_symbol");
+  if (prefillSymbol) {
+    // Clear the session storage
+    sessionStorage.removeItem("prefill_symbol");
+
+    // Open the add asset form
+    const form = document.getElementById("addAssetForm");
+    if (form) {
+      form.style.display = "block";
+
+      // Wait a bit for the form to be visible, then trigger search
+      setTimeout(() => {
+        const assetNameInput = document.getElementById("assetName");
+        if (assetNameInput) {
+          assetNameInput.value = prefillSymbol;
+          // Trigger the fuzzy search
+          searchStockSymbol(prefillSymbol);
+        }
+      }, 100);
+    }
+  }
+
   // Listen for portfolio changes
   window.addEventListener("portfolioChanged", handlePortfolioChange);
 }
@@ -32,11 +56,20 @@ function setupEventListeners() {
   const assetForm = document.getElementById("assetForm");
   const searchBtn = document.getElementById("searchBtn");
   const assetSearch = document.getElementById("assetSearch");
+  const assetNameInput = document.getElementById("assetName");
+  const purchaseDateInput = document.getElementById("purchaseDate");
+  const currencySelect = document.getElementById("currency");
 
   if (toggleAddBtn) {
     toggleAddBtn.addEventListener("click", () => {
       const form = document.getElementById("addAssetForm");
       form.style.display = form.style.display === "none" ? "block" : "none";
+
+      // Set currency from global setting when opening form
+      if (form.style.display === "block" && currencySelect) {
+        const globalCurrency = getCurrentCurrency();
+        currencySelect.value = globalCurrency;
+      }
     });
   }
 
@@ -59,6 +92,32 @@ function setupEventListeners() {
         handleSearch(assetSearch.value);
       }
     });
+  }
+
+  // Set up fuzzy search for asset name
+  if (assetNameInput) {
+    const debouncedSearch = debounce(searchStockSymbol, 300);
+    assetNameInput.addEventListener("input", (e) => {
+      debouncedSearch(e.target.value);
+    });
+
+    // Close search results when clicking outside
+    document.addEventListener("click", (e) => {
+      const searchResults = document.getElementById("assetSearchResults");
+      if (
+        searchResults &&
+        !assetNameInput.contains(e.target) &&
+        !searchResults.contains(e.target)
+      ) {
+        searchResults.style.display = "none";
+      }
+    });
+  }
+
+  // Set max date to today for purchase date
+  if (purchaseDateInput) {
+    const today = new Date().toISOString().split("T")[0];
+    purchaseDateInput.setAttribute("max", today);
   }
 }
 
@@ -139,6 +198,9 @@ async function handleCreateAsset(e) {
     return;
   }
 
+  // Use global currency setting
+  const globalCurrency = getCurrentCurrency();
+
   const formData = {
     portfolioId: currentPortfolioId,
     assetType: document.getElementById("assetType").value,
@@ -148,7 +210,7 @@ async function handleCreateAsset(e) {
     purchasePrice: parseFloat(document.getElementById("purchasePrice").value),
     currentPrice: parseFloat(document.getElementById("currentPrice").value),
     purchaseDate: document.getElementById("purchaseDate").value,
-    currency: document.getElementById("currency").value,
+    currency: globalCurrency,
     isWishlist: document.getElementById("isWishlist").checked,
   };
 
@@ -188,6 +250,81 @@ async function handleSearch(query) {
     console.error("Error searching assets:", error);
     showToast("Search failed", "error");
     hideLoading();
+  }
+}
+
+// Fuzzy search for stock symbols using Finnhub API
+async function searchStockSymbol(query) {
+  const searchResults = document.getElementById("assetSearchResults");
+
+  if (!query || query.length < 2) {
+    searchResults.style.display = "none";
+    return;
+  }
+
+  try {
+    const url = `https://finnhub.io/api/v1/search?q=${encodeURIComponent(query)}&token=${FINNHUB_API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.result || data.result.length === 0) {
+      searchResults.innerHTML =
+        '<div class="search-item">No results found</div>';
+      searchResults.style.display = "block";
+      return;
+    }
+
+    searchResults.innerHTML = data.result
+      .slice(0, 10)
+      .map(
+        (item) => `
+        <div class="search-item" data-symbol="${item.symbol}" data-name="${item.description}">
+          <div class="search-item-symbol">${item.symbol}</div>
+          <div class="search-item-name">${item.description}</div>
+          <div class="search-item-type">${item.type}</div>
+        </div>
+      `,
+      )
+      .join("");
+
+    searchResults.style.display = "block";
+
+    // Add click handlers to search results
+    searchResults.querySelectorAll(".search-item").forEach((item) => {
+      item.addEventListener("click", async () => {
+        const symbol = item.dataset.symbol;
+        const name = item.dataset.name;
+
+        // Set name and symbol
+        document.getElementById("assetName").value = name;
+        document.getElementById("assetSymbol").value = symbol;
+
+        // Fetch and set current price
+        await fetchStockPrice(symbol);
+
+        // Hide search results
+        searchResults.style.display = "none";
+      });
+    });
+  } catch (error) {
+    console.error("Error searching stocks:", error);
+    searchResults.innerHTML = '<div class="search-item">Search failed</div>';
+    searchResults.style.display = "block";
+  }
+}
+
+// Fetch current stock price using Finnhub API
+async function fetchStockPrice(symbol) {
+  try {
+    const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.c && data.c > 0) {
+      document.getElementById("currentPrice").value = data.c.toFixed(2);
+    }
+  } catch (error) {
+    console.error("Error fetching stock price:", error);
   }
 }
 

@@ -27,3 +27,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Export global utilities
 export { showToast, showLoading, hideLoading } from "./utils/ui.js";
+export { refreshPortfolioDropdown } from "./navbar.js";
+
+// Make refreshPortfolioDropdown available globally
+import { refreshPortfolioDropdown } from "./navbar.js";
+window.refreshPortfolioDropdown = refreshPortfolioDropdown;

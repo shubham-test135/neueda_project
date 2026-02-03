@@ -492,7 +492,7 @@ body {
 }
 
 .portfolio-select {
-  background: transparent;
+  background: var(--bg-primary);
   border: none;
   color: var(--text-primary);
   font-weight: 500;
@@ -501,6 +501,11 @@ body {
   padding: 0.25rem 2rem 0.25rem 0.5rem;
   min-width: 200px;
   outline: none;
+}
+
+.portfolio-select option {
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 /* Stock Ticker Mini */
@@ -1042,6 +1047,59 @@ body {
   color: var(--primary);
 }
 
+/* Search wrapper for asset name input */
+.search-wrapper {
+  position: relative;
+}
+
+.asset-search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: var(--shadow-lg);
+  margin-top: 4px;
+}
+
+.search-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  transition: var(--transition-fast);
+}
+
+.search-item:last-child {
+  border-bottom: none;
+}
+
+.search-item:hover {
+  background: var(--bg-secondary);
+}
+
+.search-item-symbol {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.search-item-name {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.search-item-type {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
 .form-input,
 .form-select {
   padding: 0.75rem var(--spacing-md);
@@ -1051,6 +1109,12 @@ body {
   color: var(--text-primary);
   background: var(--card-bg);
   transition: var(--transition-fast);
+}
+
+.form-input:read-only {
+  background: var(--bg-secondary);
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .form-input:focus,
@@ -1278,12 +1342,12 @@ body {
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   z-index: 2000;
-  align-items: center;
-  justify-content: center;
 }
 
 .modal.active {
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-content {

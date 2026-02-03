@@ -29,6 +29,9 @@ public class DashboardSummaryDTO {
     // Top performing assets
     private java.util.List<AssetPerformanceDTO> topPerformers;
 
+    // Performance data for chart
+    private PerformanceDataDTO performanceData;
+
     // Recent transactions count
     private Integer assetCount;
     private Integer wishlistCount;
