@@ -3,6 +3,7 @@ package com.example.FinBuddy.controllers;
 import com.example.FinBuddy.dto.DashboardSummaryDTO;
 import com.example.FinBuddy.entities.Portfolio;
 import com.example.FinBuddy.entities.PortfolioHistory;
+import com.example.FinBuddy.services.PortfolioRecalculationService;
 import com.example.FinBuddy.services.PortfolioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,6 +24,7 @@ import java.util.List;
 public class PortfolioController {
 
     private final PortfolioService portfolioService;
+    private final PortfolioRecalculationService portfolioRecalculationService;
 
     /**
      * Get all portfolios
@@ -92,9 +94,10 @@ public class PortfolioController {
     @PostMapping("/{id}/recalculate")
     public ResponseEntity<Portfolio> recalculateMetrics(@PathVariable Long id) {
         try {
-            Portfolio portfolio = portfolioService.recalculatePortfolioMetrics(id);
+            Portfolio portfolio = portfolioRecalculationService.recalculate(id);
             return ResponseEntity.ok(portfolio);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             return ResponseEntity.notFound().build();
         }
     }

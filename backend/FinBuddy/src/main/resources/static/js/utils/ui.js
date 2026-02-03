@@ -1,7 +1,9 @@
 // ============================================
 // UI Utilities
-// Toast notifications, loading, modals
 // ============================================
+
+let cachedRate = 1;
+let cachedCurrency = "USD";
 
 export function initUI() {
   setTimeout(() => {
@@ -17,7 +19,6 @@ export function showToast(message, type = "info") {
     toast.textContent = message;
     toast.className = "toast show";
 
-    // Change color based on type
     const colors = {
       success: "var(--success)",
       error: "var(--danger)",
@@ -36,16 +37,12 @@ export function showToast(message, type = "info") {
 // Loading Overlay
 export function showLoading() {
   const overlay = document.getElementById("loadingOverlay");
-  if (overlay) {
-    overlay.style.display = "flex";
-  }
+  if (overlay) overlay.style.display = "flex";
 }
 
 export function hideLoading() {
   const overlay = document.getElementById("loadingOverlay");
-  if (overlay) {
-    overlay.style.display = "none";
-  }
+  if (overlay) overlay.style.display = "none";
 }
 
 // Modal Management
@@ -76,7 +73,6 @@ function setupModals() {
     });
   });
 
-  // Close modal on outside click
   window.addEventListener("click", (e) => {
     if (e.target === portfolioModal) {
       closeModal(portfolioModal);
@@ -106,23 +102,40 @@ function setupPortfolioSelector() {
     portfolioSelect.addEventListener("change", (e) => {
       const portfolioId = e.target.value;
       if (portfolioId) {
-        // Trigger custom event for other modules to listen
         window.dispatchEvent(
-          new CustomEvent("portfolioChanged", {
-            detail: { portfolioId },
-          }),
+            new CustomEvent("portfolioChanged", {
+              detail: { portfolioId },
+            })
         );
       }
     });
   }
 }
 
-// Format Currency
-export function formatCurrency(amount, currency = null) {
-  // Get currency from localStorage if not specified
-  if (!currency) {
-    currency = localStorage.getItem("preferredCurrency") || "INR";
+// Exchange Rate Updater
+export async function updateExchangeRate() {
+  const currency = localStorage.getItem("preferredCurrency") || "USD";
+
+  if (currency === cachedCurrency) return;
+
+  if (currency === "USD") {
+    cachedRate = 1;
+    cachedCurrency = "USD";
+    return;
   }
+
+  const response = await fetch(
+      `http://localhost:8081/api/market/exchange-rate?from=USD&to=${currency}`
+  );
+  const data = await response.json();
+
+  cachedRate = data.rate;
+  cachedCurrency = currency;
+}
+
+// Format Currency (converted + formatted)
+export function formatCurrency(amount) {
+  const currency = localStorage.getItem("preferredCurrency") || "USD";
 
   const currencySymbols = {
     INR: "₹",
@@ -132,35 +145,18 @@ export function formatCurrency(amount, currency = null) {
   };
 
   const symbol = currencySymbols[currency] || currency;
-  const locale = currency === "INR" ? "en-IN" : "en-US";
+  const value = amount * cachedRate;
+  const locale = currency === "USD" ? "en-IN" : "en-US";
 
-  return `${symbol}${parseFloat(amount).toLocaleString(locale, {
+  return `${symbol}${value.toLocaleString(locale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
 }
 
-// Convert currency
-export async function convertCurrency(amount, fromCurrency, toCurrency) {
-  if (fromCurrency === toCurrency) {
-    return amount;
-  }
-
-  try {
-    const response = await fetch(
-      `http://localhost:8081/api/market/exchange-rate?from=${fromCurrency}&to=${toCurrency}`,
-    );
-    const data = await response.json();
-    return amount * data.rate;
-  } catch (error) {
-    console.error("Currency conversion error:", error);
-    return amount;
-  }
-}
-
 // Get current currency
 export function getCurrentCurrency() {
-  return localStorage.getItem("preferredCurrency") || "INR";
+  return localStorage.getItem("preferredCurrency") || "USD";
 }
 
 // Format Number

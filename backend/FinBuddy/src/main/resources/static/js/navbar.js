@@ -1,20 +1,25 @@
 import { portfolioAPI, marketAPI } from "./utils/api.js";
-import { debounce } from "./utils/ui.js";
+import { debounce, formatCurrency, updateExchangeRate } from "./utils/ui.js";
 
 let currentCurrency = localStorage.getItem("preferredCurrency") || "INR";
 
 export async function initGlobalNavbar() {
   const waitForNavbar = () =>
-    new Promise((resolve) => {
-      const check = () => {
-        const select = document.getElementById("portfolioSelect");
-        if (select) resolve(select);
-        else setTimeout(check, 50);
-      };
-      check();
-    });
+      new Promise((resolve) => {
+        const check = () => {
+          const select = document.getElementById("portfolioSelect");
+          if (select) resolve(select);
+          else setTimeout(check, 50);
+        };
+        check();
+      });
 
   const select = await waitForNavbar();
+  const refreshBtn = document.getElementById("refreshDataBtn");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", handleGlobalRefresh);
+  }
+
 
   try {
     const portfolios = await portfolioAPI.getAll();
@@ -40,28 +45,53 @@ export async function initGlobalNavbar() {
       const id = select.value;
       localStorage.setItem("activePortfolioId", id);
       window.dispatchEvent(
-        new CustomEvent("portfolioChanged", { detail: { portfolioId: id } }),
+          new CustomEvent("portfolioChanged", { detail: { portfolioId: id } })
       );
     });
 
-    // Fire initial event
     if (select.value) {
       window.dispatchEvent(
-        new CustomEvent("portfolioChanged", {
-          detail: { portfolioId: select.value },
-        }),
+          new CustomEvent("portfolioChanged", {
+            detail: { portfolioId: select.value },
+          })
       );
     }
 
-    // Setup global search
     setupGlobalSearch();
-
-    // Setup currency selector
     setupCurrencySelector();
   } catch (err) {
     console.error("Navbar initialization failed", err);
   }
 }
+
+async function handleGlobalRefresh() {
+  const portfolioId = localStorage.getItem("activePortfolioId");
+
+  if (!portfolioId) {
+    alert("Please select a portfolio before refreshing.");
+    return;
+  }
+
+  try {
+    const refreshBtn = document.getElementById("refreshDataBtn");
+    if (refreshBtn) refreshBtn.disabled = true;
+
+    await portfolioAPI.recalculate(portfolioId);
+
+    window.dispatchEvent(
+        new CustomEvent("portfolioChanged", {
+          detail: { portfolioId },
+        })
+    );
+  } catch (err) {
+    console.error("Refresh failed:", err);
+    alert("Failed to refresh portfolio data. Please try again.");
+  } finally {
+    const refreshBtn = document.getElementById("refreshDataBtn");
+    if (refreshBtn) refreshBtn.disabled = false;
+  }
+}
+
 
 function setupGlobalSearch() {
   const searchInput = document.getElementById("globalSearchInput");
@@ -77,33 +107,32 @@ function setupGlobalSearch() {
 
     try {
       searchResults.innerHTML =
-        '<div class="search-loading">Searching...</div>';
+          '<div class="search-loading">Searching...</div>';
       searchResults.style.display = "block";
 
       const results = await marketAPI.searchStocks(query);
 
       if (results.length === 0) {
         searchResults.innerHTML =
-          '<div class="search-empty">No results found</div>';
+            '<div class="search-empty">No results found</div>';
       } else {
         searchResults.innerHTML = results
-          .map(
-            (stock) => `
-                    <div class="search-result-item" data-symbol="${stock.symbol}">
-                        <div class="result-info">
-                            <div class="result-symbol">${stock.symbol}</div>
-                            <div class="result-name">${stock.name}</div>
-                            <div class="result-meta">${stock.exchange} • ${stock.sector}</div>
-                        </div>
-                        <div class="result-price">
-                            ${formatPrice(stock.price, stock.currency)}
-                        </div>
-                    </div>
-                `,
-          )
-          .join("");
+            .map(
+                (stock) => `
+              <div class="search-result-item" data-symbol="${stock.symbol}">
+                <div class="result-info">
+                  <div class="result-symbol">${stock.symbol}</div>
+                  <div class="result-name">${stock.name}</div>
+                  <div class="result-meta">${stock.exchange} • ${stock.sector}</div>
+                </div>
+                <div class="result-price">
+                  ${formatCurrency(stock.price)}
+                </div>
+              </div>
+            `
+            )
+            .join("");
 
-        // Add click handlers
         document.querySelectorAll(".search-result-item").forEach((item) => {
           item.addEventListener("click", () => {
             const symbol = item.dataset.symbol;
@@ -113,10 +142,9 @@ function setupGlobalSearch() {
           });
         });
       }
-    } catch (error) {
-      console.error("Search error:", error);
+    } catch {
       searchResults.innerHTML =
-        '<div class="search-error">Search failed. Please try again.</div>';
+          '<div class="search-error">Search failed. Please try again.</div>';
     }
   }, 300);
 
@@ -130,10 +158,16 @@ function setupGlobalSearch() {
     }
   });
 
-  // Close search results when clicking outside
   document.addEventListener("click", (e) => {
     if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
       searchResults.style.display = "none";
+    }
+  });
+
+  window.addEventListener("currencyChanged", () => {
+    const query = searchInput.value;
+    if (query && query.length >= 2) {
+      performSearch(query);
     }
   });
 }
@@ -142,53 +176,36 @@ function setupCurrencySelector() {
   const currencySelect = document.getElementById("currencySelect");
   if (!currencySelect) return;
 
-  // Set saved currency
   currencySelect.value = currentCurrency;
 
-  currencySelect.addEventListener("change", (e) => {
+  currencySelect.addEventListener("change", async (e) => {
     currentCurrency = e.target.value;
     localStorage.setItem("preferredCurrency", currentCurrency);
 
-    // Dispatch event to notify other components
+    await updateExchangeRate();
+
     window.dispatchEvent(
-      new CustomEvent("currencyChanged", {
-        detail: { currency: currentCurrency },
-      }),
+        new CustomEvent("currencyChanged", {
+          detail: { currency: currentCurrency },
+        })
     );
 
-    // Reload current page data
     const portfolioId = localStorage.getItem("activePortfolioId");
     if (portfolioId) {
       window.dispatchEvent(
-        new CustomEvent("portfolioChanged", {
-          detail: { portfolioId },
-        }),
+          new CustomEvent("portfolioChanged", {
+            detail: { portfolioId },
+          })
       );
     }
   });
 }
 
-function formatPrice(price, currency) {
-  const currencySymbols = {
-    INR: "₹",
-    USD: "$",
-    EUR: "€",
-    GBP: "£",
-  };
-
-  const symbol = currencySymbols[currency] || currency;
-  return `${symbol}${parseFloat(price).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
 function handleSearchResultClick(symbol) {
-  // Show stock details or add to wishlist
-  console.log("Selected stock:", symbol);
-
-  // You can add navigation or modal logic here
   window.dispatchEvent(
-    new CustomEvent("stockSelected", {
-      detail: { symbol },
-    }),
+      new CustomEvent("stockSelected", {
+        detail: { symbol },
+      })
   );
 }
 

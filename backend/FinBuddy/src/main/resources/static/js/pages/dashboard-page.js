@@ -17,8 +17,8 @@ let charts = {};
 
 // Initialize dashboard
 async function initDashboard() {
-  // initGlobalNavbar();
-  loadPortfolios();
+  initGlobalNavbar();
+  // loadPortfolios();
   setupEventListeners();
 
   // Listen for portfolio changes
