@@ -438,4 +438,31 @@ public class StockPriceService {
             return System.currentTimeMillis() - timestamp > CACHE_DURATION_MS;
         }
     }
+    public Map<String, Object> fetchStockData(String symbol) {
+
+        Map<String, Object> data = new HashMap<>();
+
+        BigDecimal currentPrice = getRealTimePrice(symbol);
+
+        // Mock previous close (for demo)
+        BigDecimal previousClose = currentPrice.multiply(BigDecimal.valueOf(0.98));
+        BigDecimal changeAmount = currentPrice.subtract(previousClose);
+        BigDecimal changePercentage = changeAmount
+                .divide(previousClose, 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+
+        data.put("symbol", symbol);
+        data.put("name", getCompanyName(symbol));
+        data.put("currentPrice", currentPrice);
+        data.put("changeAmount", changeAmount);
+        data.put("changePercentage", changePercentage);
+
+        // Optional fields (safe defaults)
+        data.put("dayHigh", currentPrice.multiply(BigDecimal.valueOf(1.02)));
+        data.put("dayLow", currentPrice.multiply(BigDecimal.valueOf(0.98)));
+        data.put("marketCap", "N/A");
+
+        return data;
+    }
+
 }
