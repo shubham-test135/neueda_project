@@ -30,7 +30,7 @@
 		<!-- Use Java 17 for local compilation (change to 21 only if JDK 21 is installed) -->
 		<java.version>17</java.version>
 		<!-- Pin lombok to a known stable version for annotation processing -->
-		<lombok.version>1.18.26</lombok.version>
+		<lombok.version>1.18.30</lombok.version>
 	</properties>
 	<dependencies>
 		<dependency>

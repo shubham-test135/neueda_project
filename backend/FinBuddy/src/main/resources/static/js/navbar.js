@@ -1,5 +1,5 @@
 import { portfolioAPI, marketAPI } from "./utils/api.js";
-import { debounce, formatCurrency, updateExchangeRate } from "./utils/ui.js";
+import { debounce, formatCurrency, updateExchangeRate , showLoading ,hideLoading } from "./utils/ui.js";
 
 let currentCurrency = localStorage.getItem("preferredCurrency") || "INR";
 
@@ -72,11 +72,13 @@ async function handleGlobalRefresh() {
   }
 
   try {
+    showLoading();
     const refreshBtn = document.getElementById("refreshDataBtn");
     if (refreshBtn) refreshBtn.disabled = true;
 
     await portfolioAPI.recalculate(portfolioId);
 
+    hideLoading();
     window.dispatchEvent(
       new CustomEvent("portfolioChanged", {
         detail: { portfolioId },

@@ -85,7 +85,10 @@ public class PortfolioService {
      * Delete portfolio
      */
     public void deletePortfolio(Long id) {
-        portfolioRepository.deleteById(id);
+        Portfolio portfolio = portfolioRepository.findByIdWithAssets(id)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found"));
+
+        portfolioRepository.delete(portfolio);
     }
 
     /**
