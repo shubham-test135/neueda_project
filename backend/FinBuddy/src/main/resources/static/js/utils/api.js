@@ -112,6 +112,7 @@ export const marketAPI = {
 
 // Report APIs
 export const reportAPI = {
+  // Fetch PDF for portfolio
   downloadPDF: async (portfolioId) => {
     const url = `${API_BASE_URL}/reports/portfolio/${portfolioId}/pdf`;
     const response = await fetch(url);
@@ -119,6 +120,14 @@ export const reportAPI = {
     const blob = await response.blob();
     return blob;
   },
+
+  // Send email with the PDF attached
+  sendEmail: async (portfolioId, email) => {
+    const response = await fetch(`${API_BASE_URL}/reports/email?portfolioId=${portfolioId}&email=${email}`, {
+      method: 'POST',
+    });
+    return await response.json();  // { success: true/false }
+  }
 };
 
 export default {

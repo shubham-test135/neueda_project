@@ -1,10 +1,6 @@
-// ============================================
-// Reports Page Logic
-// ============================================
-
 import { reportAPI } from "../utils/api.js";
 import { showToast, showLoading, hideLoading } from "../utils/ui.js";
-import {initGlobalNavbar} from "../navbar.js";
+import { initGlobalNavbar } from "../navbar.js";
 
 let currentPortfolioId = null;
 
@@ -16,14 +12,14 @@ async function initReportsPage() {
 
 function setupEventListeners() {
   const downloadPdfBtn = document.getElementById("downloadPdfBtn");
-  const downloadCsvBtn = document.getElementById("downloadCsvBtn");
+  const sendEmailBtn = document.getElementById("emailReportBtn"); // Focused on the email button
 
   if (downloadPdfBtn) {
     downloadPdfBtn.addEventListener("click", handleDownloadPDF);
   }
 
-  if (downloadCsvBtn) {
-    downloadCsvBtn.addEventListener("click", handleDownloadCSV);
+  if (sendEmailBtn) {  // Listen for clicks on the Email Report button
+    sendEmailBtn.addEventListener("click", handleSendEmail);
   }
 }
 
@@ -58,11 +54,47 @@ async function handleDownloadPDF() {
   }
 }
 
-function handleDownloadCSV() {
-  showToast("CSV export feature coming soon", "info");
+// Handle Send Email Logic
+async function handleSendEmail() {
+  if (!currentPortfolioId) {
+    showToast("Please select a portfolio first", "warning");
+    return;
+  }
+
+  const email = prompt("Please enter the email address to send the report to:");
+
+  if (!email || !validateEmail(email)) {
+    showToast("Invalid email address", "error");
+    return;
+  }
+
+  showLoading();
+
+  try {
+    // Call the API to send the report via email
+    const response = await reportAPI.sendEmail(currentPortfolioId, email);
+
+    if (response && response.success) {  // Ensure the response has the correct structure
+      showToast("Email sent successfully!", "success");
+    } else {
+      showToast("Failed to send email", "error");
+    }
+
+    hideLoading();
+  } catch (error) {
+    console.error("Error sending email:", error);
+    showToast("Error sending email", "error");
+    hideLoading();
+  }
 }
 
-// Initialize
+function validateEmail(email) {
+  // Simple email validation (you can make it more robust if needed)
+  const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  return re.test(email);
+}
+
+// Initialize the page
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initReportsPage);
 } else {
