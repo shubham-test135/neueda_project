@@ -3,7 +3,8 @@
 // Centralized API calls
 // ============================================
 
-const API_BASE_URL = "http://localhost:8081/api";
+// Use relative URL so frontend works when served from same origin as backend
+const API_BASE_URL = "/api";
 
 // Generic API call function
 async function apiCall(endpoint, options = {}) {

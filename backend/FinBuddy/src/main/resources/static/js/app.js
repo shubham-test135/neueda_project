@@ -4,7 +4,7 @@
  */
 
 // API Base URL
-const API_BASE_URL = "http://localhost:8081/api";
+const API_BASE_URL = "/api";
 
 // Global State
 let currentPortfolioId = null;
@@ -14,7 +14,14 @@ let performanceChart = null;
 
 // Initialize Dashboard
 document.addEventListener("DOMContentLoaded", () => {
-  loadPortfolios().then(r => console.log(r));
+  console.log("DOM ready, API base:", API_BASE_URL);
+  // Safely attempt to load portfolios if element exists
+  const portfolioSelectEl = document.getElementById("portfolioSelect");
+  if (portfolioSelectEl) {
+    loadPortfolios().then((r) => console.log("Portfolios loaded", r));
+  } else {
+    console.warn("portfolioSelect element not found; skipping loadPortfolios");
+  }
   setupEventListeners();
   loadBenchmarks();
 });
@@ -22,51 +29,47 @@ document.addEventListener("DOMContentLoaded", () => {
 // ================== Event Listeners ==================
 function setupEventListeners() {
   // Portfolio events
-  document
-    .getElementById("portfolioSelect")
-    .addEventListener("change", handlePortfolioChange);
-  document
-    .getElementById("createPortfolioBtn")
-    .addEventListener("click", openPortfolioModal);
-  document
-    .getElementById("portfolioForm")
-    .addEventListener("submit", createPortfolio);
+  const portfolioSelect = document.getElementById("portfolioSelect");
+  if (portfolioSelect) {
+    portfolioSelect.addEventListener("change", handlePortfolioChange);
+  }
 
-  // Asset events
-  document
-    .getElementById("toggleAddAssetBtn")
-    .addEventListener("click", toggleAddAssetForm);
-  document
-    .getElementById("cancelAssetBtn")
-    .addEventListener("click", toggleAddAssetForm);
-  document.getElementById("assetForm").addEventListener("submit", createAsset);
-  document.getElementById("searchBtn").addEventListener("click", searchAssets);
+  const createBtn = document.getElementById("createPortfolioBtn");
+  if (createBtn) createBtn.addEventListener("click", openPortfolioModal);
+
+  const portfolioForm = document.getElementById("portfolioForm");
+  if (portfolioForm) portfolioForm.addEventListener("submit", createPortfolio);
+
+  // Asset events - guard elements
+  const toggleAddAssetBtn = document.getElementById("toggleAddAssetBtn");
+  if (toggleAddAssetBtn) toggleAddAssetBtn.addEventListener("click", toggleAddAssetForm);
+
+  const cancelAssetBtn = document.getElementById("cancelAssetBtn");
+  if (cancelAssetBtn) cancelAssetBtn.addEventListener("click", toggleAddAssetForm);
+
+  const assetForm = document.getElementById("assetForm");
+  if (assetForm) assetForm.addEventListener("submit", createAsset);
+
+  const searchBtn = document.getElementById("searchBtn");
+  if (searchBtn) searchBtn.addEventListener("click", searchAssets);
 
   // Refresh data
-  document
-    .getElementById("refreshDataBtn")
-    .addEventListener("click", refreshData);
+  const refreshDataBtn = document.getElementById("refreshDataBtn");
+  if (refreshDataBtn) refreshDataBtn.addEventListener("click", refreshData);
 
   // PDF download
-  document
-    .getElementById("downloadPdfBtn")
-    .addEventListener("click", downloadPdf);
+  const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+  if (downloadPdfBtn) downloadPdfBtn.addEventListener("click", downloadPdf);
 
   // Enhanced features (if elements exist)
   const exportCsvBtn = document.getElementById("exportCsvBtn");
-  if (exportCsvBtn) {
-    exportCsvBtn.addEventListener("click", exportToCSV);
-  }
+  if (exportCsvBtn) exportCsvBtn.addEventListener("click", exportToCSV);
 
   const shareBtn = document.getElementById("shareBtn");
-  if (shareBtn) {
-    shareBtn.addEventListener("click", sharePortfolio);
-  }
+  if (shareBtn) shareBtn.addEventListener("click", sharePortfolio);
 
   const themeToggle = document.getElementById("themeToggle");
-  if (themeToggle) {
-    themeToggle.addEventListener("click", toggleTheme);
-  }
+  if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
 
   // Modal close
   document.querySelectorAll(".close, .close-modal").forEach((el) => {
@@ -77,11 +80,14 @@ function setupEventListeners() {
 // ================== Portfolio Functions ==================
 async function loadPortfolios() {
   try {
-    const response = await fetch(`${API_BASE_URL}/portfolios`);
+    console.log("Loading portfolios from API...");
+    const response = await fetch(`/api/portfolios`);
     const portfolios = await response.json();
     console.log(portfolios);
 
     const select = document.getElementById("portfolioSelect");
+    if (!select) return portfolios;
+
     select.innerHTML = '<option value="">-- Select a Portfolio --</option>';
 
     portfolios.forEach((portfolio) => {
@@ -96,14 +102,19 @@ async function loadPortfolios() {
       select.value = portfolios[0].id;
       await handlePortfolioChange();
     }
+
+    return portfolios;
   } catch (error) {
     console.error("Error loading portfolios:", error);
     showNotification("Failed to load portfolios", "error");
+    return [];
   }
 }
 
 async function handlePortfolioChange() {
   const select = document.getElementById("portfolioSelect");
+  if (!select) return;
+
   currentPortfolioId = select.value;
 
   if (!currentPortfolioId) {
@@ -120,16 +131,20 @@ async function handlePortfolioChange() {
 }
 
 async function createPortfolio(event) {
-  event.preventDefault();
+  if (event && event.preventDefault) event.preventDefault();
+
+  const nameEl = document.getElementById("portfolioName");
+  const descEl = document.getElementById("portfolioDescription");
+  const baseEl = document.getElementById("portfolioBaseCurrency");
 
   const portfolio = {
-    name: document.getElementById("portfolioName").value,
-    description: document.getElementById("portfolioDescription").value,
-    baseCurrency: document.getElementById("portfolioBaseCurrency").value,
+    name: nameEl ? nameEl.value : "",
+    description: descEl ? descEl.value : "",
+    baseCurrency: baseEl ? baseEl.value : "USD",
   };
 
   try {
-    const response = await fetch(`${API_BASE_URL}/portfolios`, {
+    const response = await fetch(`/api/portfolios`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(portfolio),
@@ -138,7 +153,8 @@ async function createPortfolio(event) {
     if (response.ok) {
       showNotification("Portfolio created successfully!", "success");
       closeModal();
-      document.getElementById("portfolioForm").reset();
+      const portfolioForm = document.getElementById("portfolioForm");
+      if (portfolioForm) portfolioForm.reset();
       await loadPortfolios();
     } else {
       showNotification("Failed to create portfolio", "error");
