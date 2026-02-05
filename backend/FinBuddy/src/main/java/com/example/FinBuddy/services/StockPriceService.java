@@ -476,6 +476,7 @@ public class StockPriceService {
                 result.put("exchange", exchange);
                 result.put("price", price);
                 result.put("currency", exchange.equals("NSE") ? "INR" : "USD");
+                result.put("type", "Stock");
 
                 results.add(result);
 
@@ -487,6 +488,334 @@ public class StockPriceService {
         }
 
         return results;
+    }
+
+    /**
+     * Search for bonds by symbol or name
+     */
+    public java.util.List<Map<String, Object>> searchBonds(String query) {
+        java.util.List<Map<String, Object>> results = new java.util.ArrayList<>();
+
+        // Mock bond database - in production, this would query a real database or API
+        // Format: Symbol, Name, Issuer, Type, CouponRate, CreditRating, Currency
+        String[][] bondDatabase = {
+                { "US10Y", "US 10-Year Treasury Bond", "US Government", "Government", "4.25", "AAA", "USD" },
+                { "US30Y", "US 30-Year Treasury Bond", "US Government", "Government", "4.50", "AAA", "USD" },
+                { "US5Y", "US 5-Year Treasury Bond", "US Government", "Government", "4.00", "AAA", "USD" },
+                { "US2Y", "US 2-Year Treasury Bond", "US Government", "Government", "4.75", "AAA", "USD" },
+                { "AAPL-2030", "Apple Inc. 2030 Bond", "Apple Inc.", "Corporate", "3.50", "AA+", "USD" },
+                { "MSFT-2028", "Microsoft Corp 2028 Bond", "Microsoft", "Corporate", "3.25", "AAA", "USD" },
+                { "GOOGL-2035", "Alphabet Inc. 2035 Bond", "Alphabet", "Corporate", "3.75", "AA+", "USD" },
+                { "JPM-2029", "JPMorgan Chase 2029 Bond", "JPMorgan Chase", "Corporate", "4.00", "A+", "USD" },
+                { "IN10Y", "India 10-Year Government Bond", "Government of India", "Government", "7.25", "BBB-", "INR" },
+                { "IN5Y", "India 5-Year Government Bond", "Government of India", "Government", "7.00", "BBB-", "INR" },
+                { "HDFC-2027", "HDFC Bank 2027 Bond", "HDFC Bank", "Corporate", "7.50", "AAA", "INR" },
+                { "ICICI-2026", "ICICI Bank 2026 Bond", "ICICI Bank", "Corporate", "7.25", "AAA", "INR" },
+                { "RIL-2030", "Reliance Industries 2030 Bond", "Reliance Industries", "Corporate", "7.75", "AA+", "INR" },
+                { "SBI-2028", "SBI 2028 Bond", "State Bank of India", "Corporate", "7.35", "AAA", "INR" },
+                { "TATA-2029", "Tata Steel 2029 Bond", "Tata Steel", "Corporate", "8.00", "AA", "INR" },
+                { "MUNI-NYC", "New York City Municipal Bond", "NYC", "Municipal", "3.00", "AA", "USD" },
+                { "MUNI-CA", "California State Municipal Bond", "California", "Municipal", "3.25", "AA-", "USD" },
+                { "TIPS-10Y", "Treasury Inflation-Protected Securities", "US Government", "Government", "1.50", "AAA", "USD" },
+                { "GER10Y", "German 10-Year Bund", "German Government", "Government", "2.25", "AAA", "EUR" },
+                { "UK10Y", "UK 10-Year Gilt", "UK Government", "Government", "4.00", "AA", "GBP" }
+        };
+
+        String searchQuery = query.toLowerCase().trim();
+
+        for (String[] bond : bondDatabase) {
+            String symbol = bond[0];
+            String name = bond[1];
+            String issuer = bond[2];
+            String bondType = bond[3];
+            String couponRate = bond[4];
+            String creditRating = bond[5];
+            String currency = bond[6];
+
+            // Fuzzy search by symbol, name, issuer, or type
+            if (fuzzyMatch(symbol, searchQuery) ||
+                    fuzzyMatch(name, searchQuery) ||
+                    fuzzyMatch(issuer, searchQuery) ||
+                    fuzzyMatch(bondType, searchQuery)) {
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("symbol", symbol);
+                result.put("name", name);
+                result.put("issuer", issuer);
+                result.put("bondType", bondType);
+                result.put("couponRate", new BigDecimal(couponRate));
+                result.put("creditRating", creditRating);
+                result.put("currency", currency);
+                result.put("type", "Bond");
+                result.put("price", new BigDecimal("100.00")); // Par value for bonds
+
+                results.add(result);
+
+                if (results.size() >= 10) {
+                    break;
+                }
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Search for mutual funds by symbol or name
+     */
+    public java.util.List<Map<String, Object>> searchMutualFunds(String query) {
+        java.util.List<Map<String, Object>> results = new java.util.ArrayList<>();
+
+        // Mock mutual fund database
+        // Format: Symbol, Name, FundHouse, Category, NAV, ExpenseRatio, RiskLevel, Currency
+        String[][] mutualFundDatabase = {
+                { "VOO", "Vanguard S&P 500 ETF", "Vanguard", "Index Fund", "450.25", "0.03", "Medium", "USD" },
+                { "VTI", "Vanguard Total Stock Market ETF", "Vanguard", "Index Fund", "245.50", "0.03", "Medium", "USD" },
+                { "VXUS", "Vanguard Total International Stock ETF", "Vanguard", "International", "58.75", "0.07", "Medium", "USD" },
+                { "BND", "Vanguard Total Bond Market ETF", "Vanguard", "Bond Fund", "72.50", "0.03", "Low", "USD" },
+                { "SPY", "SPDR S&P 500 ETF Trust", "State Street", "Index Fund", "510.25", "0.09", "Medium", "USD" },
+                { "QQQ", "Invesco QQQ Trust", "Invesco", "Technology", "450.75", "0.20", "High", "USD" },
+                { "IWM", "iShares Russell 2000 ETF", "BlackRock", "Small Cap", "210.50", "0.19", "High", "USD" },
+                { "VWO", "Vanguard FTSE Emerging Markets ETF", "Vanguard", "Emerging Markets", "42.25", "0.08", "High", "USD" },
+                { "FXAIX", "Fidelity 500 Index Fund", "Fidelity", "Index Fund", "175.50", "0.015", "Medium", "USD" },
+                { "VFIAX", "Vanguard 500 Index Admiral", "Vanguard", "Index Fund", "425.75", "0.04", "Medium", "USD" },
+                { "HDFC-EQUITY", "HDFC Equity Fund", "HDFC Mutual Fund", "Large Cap", "850.25", "1.75", "Medium", "INR" },
+                { "HDFC-MIDCAP", "HDFC Mid-Cap Opportunities Fund", "HDFC Mutual Fund", "Mid Cap", "125.50", "1.85", "High", "INR" },
+                { "ICICI-BLUECHIP", "ICICI Prudential Bluechip Fund", "ICICI Prudential", "Large Cap", "75.25", "1.65", "Medium", "INR" },
+                { "SBI-SMALLCAP", "SBI Small Cap Fund", "SBI Mutual Fund", "Small Cap", "145.75", "1.95", "High", "INR" },
+                { "AXIS-BLUECHIP", "Axis Bluechip Fund", "Axis Mutual Fund", "Large Cap", "48.50", "1.55", "Low", "INR" },
+                { "MIRAE-LARGE", "Mirae Asset Large Cap Fund", "Mirae Asset", "Large Cap", "85.25", "1.45", "Medium", "INR" },
+                { "PARAG-FLEXI", "Parag Parikh Flexi Cap Fund", "PPFAS", "Flexi Cap", "62.75", "1.35", "Medium", "INR" },
+                { "UTI-NIFTY", "UTI Nifty 50 Index Fund", "UTI Mutual Fund", "Index Fund", "155.50", "0.20", "Medium", "INR" },
+                { "NIPPON-INDIA", "Nippon India Growth Fund", "Nippon India", "Multi Cap", "2500.25", "1.75", "High", "INR" },
+                { "KOTAK-STD", "Kotak Standard Multicap Fund", "Kotak Mahindra", "Multi Cap", "48.75", "1.55", "Medium", "INR" }
+        };
+
+        String searchQuery = query.toLowerCase().trim();
+
+        for (String[] fund : mutualFundDatabase) {
+            String symbol = fund[0];
+            String name = fund[1];
+            String fundHouse = fund[2];
+            String category = fund[3];
+            String nav = fund[4];
+            String expenseRatio = fund[5];
+            String riskLevel = fund[6];
+            String currency = fund[7];
+
+            // Fuzzy search
+            if (fuzzyMatch(symbol, searchQuery) ||
+                    fuzzyMatch(name, searchQuery) ||
+                    fuzzyMatch(fundHouse, searchQuery) ||
+                    fuzzyMatch(category, searchQuery)) {
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("symbol", symbol);
+                result.put("name", name);
+                result.put("fundHouse", fundHouse);
+                result.put("category", category);
+                result.put("nav", new BigDecimal(nav));
+                result.put("expenseRatio", new BigDecimal(expenseRatio));
+                result.put("riskLevel", riskLevel);
+                result.put("currency", currency);
+                result.put("type", "Mutual Fund");
+                result.put("price", new BigDecimal(nav));
+
+                results.add(result);
+
+                if (results.size() >= 10) {
+                    break;
+                }
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Search for SIPs by symbol or name
+     */
+    public java.util.List<Map<String, Object>> searchSIPs(String query) {
+        java.util.List<Map<String, Object>> results = new java.util.ArrayList<>();
+
+        // Mock SIP database - these are typically mutual funds offered with SIP option
+        // Format: Symbol, Name, FundHouse, Category, MinSIP, NAV, RiskLevel, Currency
+        String[][] sipDatabase = {
+                { "HDFC-SIP-EQUITY", "HDFC Equity Fund - SIP", "HDFC Mutual Fund", "Large Cap", "500", "850.25", "Medium", "INR" },
+                { "HDFC-SIP-MIDCAP", "HDFC Mid-Cap Opportunities - SIP", "HDFC Mutual Fund", "Mid Cap", "500", "125.50", "High", "INR" },
+                { "ICICI-SIP-BLUE", "ICICI Prudential Bluechip - SIP", "ICICI Prudential", "Large Cap", "500", "75.25", "Medium", "INR" },
+                { "SBI-SIP-SMALL", "SBI Small Cap Fund - SIP", "SBI Mutual Fund", "Small Cap", "500", "145.75", "High", "INR" },
+                { "AXIS-SIP-BLUE", "Axis Bluechip Fund - SIP", "Axis Mutual Fund", "Large Cap", "500", "48.50", "Low", "INR" },
+                { "MIRAE-SIP-LARGE", "Mirae Asset Large Cap - SIP", "Mirae Asset", "Large Cap", "1000", "85.25", "Medium", "INR" },
+                { "PARAG-SIP-FLEXI", "Parag Parikh Flexi Cap - SIP", "PPFAS", "Flexi Cap", "1000", "62.75", "Medium", "INR" },
+                { "UTI-SIP-NIFTY", "UTI Nifty 50 Index - SIP", "UTI Mutual Fund", "Index Fund", "500", "155.50", "Medium", "INR" },
+                { "NIPPON-SIP-GROWTH", "Nippon India Growth - SIP", "Nippon India", "Multi Cap", "100", "2500.25", "High", "INR" },
+                { "KOTAK-SIP-STD", "Kotak Standard Multicap - SIP", "Kotak Mahindra", "Multi Cap", "500", "48.75", "Medium", "INR" },
+                { "TATA-SIP-DIGITAL", "Tata Digital India Fund - SIP", "Tata Mutual Fund", "Technology", "500", "38.50", "High", "INR" },
+                { "ADITYA-SIP-TAX", "Aditya Birla Sun Life Tax Relief - SIP", "Aditya Birla", "ELSS", "500", "45.25", "Medium", "INR" },
+                { "DSP-SIP-TAX", "DSP Tax Saver Fund - SIP", "DSP Mutual Fund", "ELSS", "500", "85.75", "Medium", "INR" },
+                { "FRANKLIN-SIP-PRIMA", "Franklin India Prima Fund - SIP", "Franklin Templeton", "Mid Cap", "500", "1350.50", "High", "INR" },
+                { "SUNDARAM-SIP-MID", "Sundaram Mid Cap Fund - SIP", "Sundaram Mutual Fund", "Mid Cap", "500", "825.25", "High", "INR" },
+                { "CANARA-SIP-EQUITY", "Canara Robeco Equity Hybrid - SIP", "Canara Robeco", "Hybrid", "1000", "245.50", "Medium", "INR" },
+                { "INVESCO-SIP-GROWTH", "Invesco India Growth Opp - SIP", "Invesco", "Multi Cap", "500", "58.75", "Medium", "INR" },
+                { "L&T-SIP-EMERGING", "L&T Emerging Businesses - SIP", "L&T Mutual Fund", "Small Cap", "500", "48.25", "High", "INR" },
+                { "MOTILAL-SIP-S&P500", "Motilal Oswal S&P 500 Index - SIP", "Motilal Oswal", "International", "500", "25.50", "Medium", "INR" },
+                { "EDELWEISS-SIP-BALANCE", "Edelweiss Balanced Advantage - SIP", "Edelweiss", "Hybrid", "500", "38.25", "Low", "INR" }
+        };
+
+        String searchQuery = query.toLowerCase().trim();
+
+        for (String[] sip : sipDatabase) {
+            String symbol = sip[0];
+            String name = sip[1];
+            String fundHouse = sip[2];
+            String category = sip[3];
+            String minSIP = sip[4];
+            String nav = sip[5];
+            String riskLevel = sip[6];
+            String currency = sip[7];
+
+            // Fuzzy search
+            if (fuzzyMatch(symbol, searchQuery) ||
+                    fuzzyMatch(name, searchQuery) ||
+                    fuzzyMatch(fundHouse, searchQuery) ||
+                    fuzzyMatch(category, searchQuery)) {
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("symbol", symbol);
+                result.put("name", name);
+                result.put("fundHouse", fundHouse);
+                result.put("category", category);
+                result.put("minSIP", new BigDecimal(minSIP));
+                result.put("nav", new BigDecimal(nav));
+                result.put("riskLevel", riskLevel);
+                result.put("currency", currency);
+                result.put("type", "SIP");
+                result.put("price", new BigDecimal(nav));
+
+                results.add(result);
+
+                if (results.size() >= 10) {
+                    break;
+                }
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Search all asset types
+     */
+    public java.util.List<Map<String, Object>> searchAllAssets(String query, String assetType) {
+        if (assetType == null || assetType.isEmpty() || assetType.equalsIgnoreCase("ALL")) {
+            // Search all types and combine results
+            java.util.List<Map<String, Object>> allResults = new java.util.ArrayList<>();
+            allResults.addAll(searchStocks(query));
+            allResults.addAll(searchBonds(query));
+            allResults.addAll(searchMutualFunds(query));
+            allResults.addAll(searchSIPs(query));
+
+            // Sort by relevance and limit
+            return allResults.stream()
+                    .sorted((a, b) -> {
+                        int scoreA = calculateRelevanceScore(a, query);
+                        int scoreB = calculateRelevanceScore(b, query);
+                        return scoreB - scoreA;
+                    })
+                    .limit(15)
+                    .collect(java.util.stream.Collectors.toList());
+        }
+
+        switch (assetType.toUpperCase()) {
+            case "STOCK":
+                return searchStocks(query);
+            case "BOND":
+                return searchBonds(query);
+            case "MUTUAL_FUND":
+                return searchMutualFunds(query);
+            case "SIP":
+                return searchSIPs(query);
+            default:
+                return searchStocks(query);
+        }
+    }
+
+    /**
+     * Calculate relevance score for sorting search results
+     */
+    private int calculateRelevanceScore(Map<String, Object> result, String query) {
+        String symbol = ((String) result.get("symbol")).toLowerCase();
+        String name = ((String) result.get("name")).toLowerCase();
+        String queryLower = query.toLowerCase();
+
+        // Exact match on symbol
+        if (symbol.equals(queryLower)) return 100;
+        // Symbol starts with query
+        if (symbol.startsWith(queryLower)) return 90;
+        // Name starts with query
+        if (name.startsWith(queryLower)) return 80;
+        // Symbol contains query
+        if (symbol.contains(queryLower)) return 70;
+        // Name contains query
+        if (name.contains(queryLower)) return 60;
+        // Fuzzy match
+        return 50;
+    }
+
+    /**
+     * Fuzzy match helper using Levenshtein distance
+     */
+    private boolean fuzzyMatch(String text, String query) {
+        if (text == null || query == null) return false;
+
+        String textLower = text.toLowerCase();
+        String queryLower = query.toLowerCase();
+
+        // Exact match or contains
+        if (textLower.contains(queryLower)) return true;
+
+        // Split query into words for partial matching
+        String[] queryWords = queryLower.split("\\s+");
+        for (String word : queryWords) {
+            if (word.length() >= 2 && textLower.contains(word)) {
+                return true;
+            }
+        }
+
+        // Levenshtein distance for typo tolerance
+        if (query.length() >= 3) {
+            int distance = levenshteinDistance(textLower, queryLower);
+            int maxLength = Math.max(textLower.length(), queryLower.length());
+            double similarity = 1.0 - ((double) distance / maxLength);
+            return similarity > 0.6; // 60% similarity threshold
+        }
+
+        return false;
+    }
+
+    /**
+     * Calculate Levenshtein distance between two strings
+     */
+    private int levenshteinDistance(String s1, String s2) {
+        int[][] dp = new int[s1.length() + 1][s2.length() + 1];
+
+        for (int i = 0; i <= s1.length(); i++) {
+            for (int j = 0; j <= s2.length(); j++) {
+                if (i == 0) {
+                    dp[i][j] = j;
+                } else if (j == 0) {
+                    dp[i][j] = i;
+                } else {
+                    int cost = s1.charAt(i - 1) == s2.charAt(j - 1) ? 0 : 1;
+                    dp[i][j] = Math.min(
+                            Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1),
+                            dp[i - 1][j - 1] + cost
+                    );
+                }
+            }
+        }
+        return dp[s1.length()][s2.length()];
     }
 
     /**

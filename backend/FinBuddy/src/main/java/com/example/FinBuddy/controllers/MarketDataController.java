@@ -115,4 +115,42 @@ public class MarketDataController {
         List<Map<String, Object>> results = stockPriceService.searchStocks(query);
         return ResponseEntity.ok(results);
     }
+
+    /**
+     * Search for bonds by symbol or name (with fuzzy search)
+     */
+    @GetMapping("/search/bonds")
+    public ResponseEntity<List<Map<String, Object>>> searchBonds(@RequestParam String query) {
+        List<Map<String, Object>> results = stockPriceService.searchBonds(query);
+        return ResponseEntity.ok(results);
+    }
+
+    /**
+     * Search for mutual funds by symbol or name (with fuzzy search)
+     */
+    @GetMapping("/search/mutual-funds")
+    public ResponseEntity<List<Map<String, Object>>> searchMutualFunds(@RequestParam String query) {
+        List<Map<String, Object>> results = stockPriceService.searchMutualFunds(query);
+        return ResponseEntity.ok(results);
+    }
+
+    /**
+     * Search for SIPs by symbol or name (with fuzzy search)
+     */
+    @GetMapping("/search/sips")
+    public ResponseEntity<List<Map<String, Object>>> searchSIPs(@RequestParam String query) {
+        List<Map<String, Object>> results = stockPriceService.searchSIPs(query);
+        return ResponseEntity.ok(results);
+    }
+
+    /**
+     * Search all asset types with optional type filter (with fuzzy search)
+     */
+    @GetMapping("/search/all")
+    public ResponseEntity<List<Map<String, Object>>> searchAllAssets(
+            @RequestParam String query,
+            @RequestParam(required = false) String type) {
+        List<Map<String, Object>> results = stockPriceService.searchAllAssets(query, type);
+        return ResponseEntity.ok(results);
+    }
 }

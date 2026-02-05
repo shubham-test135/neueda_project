@@ -114,6 +114,19 @@ export const marketAPI = {
   getBenchmark: (index) => apiCall(`/market/benchmark/${index}`),
   searchStocks: (query) =>
     apiCall(`/market/search?query=${encodeURIComponent(query)}`),
+  searchBonds: (query) =>
+    apiCall(`/market/search/bonds?query=${encodeURIComponent(query)}`),
+  searchMutualFunds: (query) =>
+    apiCall(`/market/search/mutual-funds?query=${encodeURIComponent(query)}`),
+  searchSIPs: (query) =>
+    apiCall(`/market/search/sips?query=${encodeURIComponent(query)}`),
+  searchAllAssets: (query, type = null) => {
+    let url = `/market/search/all?query=${encodeURIComponent(query)}`;
+    if (type) {
+      url += `&type=${encodeURIComponent(type)}`;
+    }
+    return apiCall(url);
+  },
 };
 
 // Report APIs

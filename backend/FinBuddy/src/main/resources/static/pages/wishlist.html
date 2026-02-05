@@ -14,9 +14,9 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="../css/dashboard.css" />
     <link rel="stylesheet" href="../css/components.css" />
-    <link rel="stylesheet" href="../css/analytics-wishlist.css" />
     <link rel="stylesheet" href="../css/wishlist-enhanced.css" />
   </head>
   <body>
@@ -30,127 +30,112 @@
 
       <!-- Main Content Area -->
       <main class="main-content">
+        <!-- Loading Overlay -->
+        <div id="wishlistLoading" class="loading-overlay" style="display: none">
+          <div class="spinner"></div>
+          <p>Loading wishlist...</p>
+        </div>
+
         <div class="content-wrapper">
           <!-- Page Header -->
-          <header class="page-header">
+          <div class="page-header">
             <div>
               <h1 class="page-title">
                 <i class="fas fa-star"></i>
                 Investment Wishlist
               </h1>
               <p class="page-subtitle">
-                Track and analyze potential investments before buying
+                Track and monitor assets before adding to your portfolio
+                <span class="auto-refresh-badge" title="Prices refresh automatically every 60 seconds">
+                  <span class="dot"></span>
+                  Auto-refreshing
+                </span>
               </p>
             </div>
             <div class="header-actions">
-              <button class="btn-secondary" id="shareBtn">
-                <i class="fas fa-share-alt"></i> Share
+              <button class="btn btn-secondary" id="refreshPricesBtn" title="Click to refresh prices manually">
+                <i class="fas fa-sync-alt"></i>
+                <span>Refresh</span>
               </button>
-              <button class="btn-primary" id="addToWishlistBtn">
-                <i class="fas fa-plus"></i> Add to Wishlist
+              <button class="btn btn-primary" id="addToWishlistBtn">
+                <i class="fas fa-plus"></i>
+                <span>Add Asset</span>
               </button>
             </div>
-          </header>
+          </div>
 
-          <!-- Wishlist Summary -->
-          <section class="section-card" aria-labelledby="summary-heading">
-            <div class="wishlist-summary">
-              <article class="summary-item">
-                <div class="summary-icon gradient-blue">
+          <!-- Summary Cards -->
+          <div class="summary-cards">
+            <div class="card card-animated" title="Total number of assets you're tracking in your wishlist">
+              <div class="card-header">
+                <div class="card-icon gradient-blue">
                   <i class="fas fa-list"></i>
                 </div>
-                <div class="summary-content">
-                  <h2 class="summary-label">Total Watchlist</h2>
-                  <p class="summary-value" id="totalWatchlist">0</p>
-                </div>
-              </article>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">Total Watching</h3>
+                <p class="card-value" id="totalWatchlist">0</p>
+                <small class="card-subtitle">Assets in watchlist</small>
+              </div>
+            </div>
 
-              <article class="summary-item">
-                <div class="summary-icon gradient-green">
-                  <i class="fas fa-arrow-up"></i>
+            <div class="card card-animated" title="Assets with positive price change today">
+              <div class="card-header">
+                <div class="card-icon gradient-green">
+                  <i class="fas fa-arrow-trend-up"></i>
                 </div>
-                <div class="summary-content">
-                  <h2 class="summary-label">Gainers Today</h2>
-                  <p class="summary-value positive" id="gainersCount">0</p>
-                </div>
-              </article>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">Gainers</h3>
+                <p class="card-value positive" id="gainersCount">0</p>
+                <small class="card-subtitle">Up today</small>
+              </div>
+            </div>
 
-              <article class="summary-item">
-                <div class="summary-icon gradient-red">
-                  <i class="fas fa-arrow-down"></i>
+            <div class="card card-animated" title="Assets with negative price change today">
+              <div class="card-header">
+                <div class="card-icon gradient-red">
+                  <i class="fas fa-arrow-trend-down"></i>
                 </div>
-                <div class="summary-content">
-                  <h2 class="summary-label">Losers Today</h2>
-                  <p class="summary-value negative" id="losersCount">0</p>
-                </div>
-              </article>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">Losers</h3>
+                <p class="card-value negative" id="losersCount">0</p>
+                <small class="card-subtitle">Down today</small>
+              </div>
+            </div>
 
-              <article class="summary-item">
-                <div class="summary-icon gradient-orange">
+            <div class="card card-animated" title="Set a target price to get notified when asset reaches that price">
+              <div class="card-header">
+                <div class="card-icon gradient-orange">
                   <i class="fas fa-bell"></i>
                 </div>
-                <div class="summary-content">
-                  <h2 class="summary-label">Price Alerts</h2>
-                  <p class="summary-value" id="alertsCount">0</p>
-                </div>
-              </article>
-            </div>
-          </section>
-
-          <!-- Search and Filter -->
-          <section class="section-card">
-            <div class="search-filter-bar">
-              <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input
-                  type="search"
-                  id="wishlistSearch"
-                  placeholder="Search wishlist..."
-                  aria-label="Search wishlist items"
-                />
               </div>
-              <div class="filter-controls">
-                <select
-                  id="categoryFilter"
-                  class="select-input"
-                  aria-label="Filter by category"
-                >
-                  <option value="all">All Categories</option>
-                  <option value="stocks">Stocks</option>
-                  <option value="bonds">Bonds</option>
-                  <option value="crypto">Cryptocurrency</option>
-                  <option value="etf">ETFs</option>
-                </select>
-                <select
-                  id="sortBy"
-                  class="select-input"
-                  aria-label="Sort wishlist"
-                >
-                  <option value="name">Name (A-Z)</option>
-                  <option value="price">Price</option>
-                  <option value="change">Change %</option>
-                  <option value="added">Date Added</option>
-                </select>
+              <div class="card-body">
+                <h3 class="card-title">Price Alerts</h3>
+                <p class="card-value" id="alertsCount">0</p>
+                <small class="card-subtitle">Active alerts</small>
               </div>
             </div>
-          </section>
+          </div>
 
-          <!-- Add to Wishlist Form -->
-          <div
-            class="add-asset-form"
-            id="addWishlistForm"
-            style="display: none"
-          >
-            <div class="form-header">
-              <h3><i class="fas fa-star"></i> Add to Wishlist</h3>
-              <button class="close-form-btn" id="cancelWishlistBtn">
+          <!-- Add Asset Form -->
+          <div class="section-card add-asset-form" id="addWishlistForm" style="display: none">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-plus-circle"></i>
+                <h2>Add to Wishlist</h2>
+              </div>
+              <button class="btn-icon" id="cancelWishlistBtn" aria-label="Close form">
                 <i class="fas fa-times"></i>
               </button>
             </div>
-            <form id="wishlistForm">
-              <div class="form-grid">
+            <form id="wishlistForm" class="wishlist-add-form">
+              <div class="form-row">
                 <div class="form-group">
-                  <label><i class="fas fa-layer-group"></i> Asset Type</label>
+                  <label for="wishlistAssetType">
+                    <i class="fas fa-layer-group"></i> Asset Type
+                  </label>
                   <select id="wishlistAssetType" class="form-select" required>
                     <option value="">Select Type</option>
                     <option value="STOCK">Stock</option>
@@ -159,289 +144,130 @@
                     <option value="SIP">SIP</option>
                   </select>
                 </div>
-                <div class="form-group">
-                  <label><i class="fas fa-tag"></i> Name</label>
+                <div class="form-group search-group">
+                  <label for="wishlistAssetName">
+                    <i class="fas fa-search"></i> Search Asset
+                    <small>(fuzzy search)</small>
+                  </label>
                   <div class="search-wrapper">
                     <input
                       type="text"
                       id="wishlistAssetName"
                       class="form-input"
-                      placeholder="Search for stocks, bonds, mutual funds..."
+                      placeholder="Type to search..."
                       autocomplete="off"
                       required
                     />
-                    <div
-                      class="asset-search-results"
-                      id="wishlistSearchResults"
-                      style="display: none"
-                    ></div>
+                    <div class="asset-search-results" id="wishlistSearchResults" style="display: none"></div>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label><i class="fas fa-code"></i> Symbol</label>
+                  <label for="wishlistAssetSymbol">
+                    <i class="fas fa-tag"></i> Symbol
+                  </label>
                   <input
                     type="text"
                     id="wishlistAssetSymbol"
                     class="form-input"
-                    placeholder="Symbol (auto-filled from search)"
+                    placeholder="Auto-filled"
                     readonly
                     required
                   />
                 </div>
                 <div class="form-group">
-                  <label
-                    ><i class="fas fa-dollar-sign"></i> Target Price
-                    (Optional)</label
-                  >
+                  <label for="wishlistTargetPrice">
+                    <i class="fas fa-bullseye"></i> Target Price
+                  </label>
                   <input
                     type="number"
                     step="0.01"
                     id="wishlistTargetPrice"
                     class="form-input"
-                    placeholder="Set target price"
+                    placeholder="Optional"
                   />
                 </div>
               </div>
               <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="cancelWishlistBtn2">
+                  Cancel
+                </button>
                 <button type="submit" class="btn btn-primary">
                   <i class="fas fa-star"></i> Add to Wishlist
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  id="cancelWishlistBtn2"
-                >
-                  <i class="fas fa-times"></i> Cancel
                 </button>
               </div>
             </form>
           </div>
 
-          <!-- Wishlist Items -->
-          <section class="section-card" aria-labelledby="wishlist-heading">
-            <div class="section-header">
-              <div class="section-title">
-                <i class="fas fa-heart"></i>
-                <h2 id="wishlist-heading">My Watchlist</h2>
+          <!-- Search & Filter Bar -->
+          <div class="section-card filter-bar">
+            <div class="filter-row">
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input
+                  type="search"
+                  id="wishlistSearch"
+                  placeholder="Search your wishlist..."
+                  aria-label="Search wishlist"
+                />
+              </div>
+              <div class="filter-group">
+                <select id="categoryFilter" class="form-select" aria-label="Filter by category">
+                  <option value="all">All Types</option>
+                  <option value="stock">Stocks</option>
+                  <option value="bond">Bonds</option>
+                  <option value="mutual_fund">Mutual Funds</option>
+                  <option value="sip">SIPs</option>
+                </select>
+                <select id="sortBy" class="form-select" aria-label="Sort by">
+                  <option value="added">Recently Added</option>
+                  <option value="name">Name (A-Z)</option>
+                  <option value="price">Price</option>
+                  <option value="change">Change %</option>
+                </select>
               </div>
             </div>
+          </div>
 
-            <div class="wishlist-grid" id="wishlistGrid">
-              <!-- Wishlist items will be dynamically loaded -->
-              <article class="wishlist-card">
-                <div class="wishlist-card-header">
-                  <div class="asset-info">
-                    <h3 class="asset-symbol">AAPL</h3>
-                    <p class="asset-name">Apple Inc.</p>
-                    <span class="asset-category">Technology</span>
-                  </div>
-                  <button
-                    class="btn-icon favorite active"
-                    aria-label="Remove from wishlist"
-                  >
-                    <i class="fas fa-star"></i>
-                  </button>
-                </div>
-
-                <div class="wishlist-card-body">
-                  <div class="price-info">
-                    <p class="current-price">$185.25</p>
-                    <span class="price-change positive">
-                      <i class="fas fa-arrow-up"></i> +2.35%
-                    </span>
-                  </div>
-
-                  <div class="price-details">
-                    <div class="detail-item">
-                      <span class="detail-label">Day Range</span>
-                      <span class="detail-value">$182.10 - $186.50</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">52W Range</span>
-                      <span class="detail-value">$142.50 - $195.80</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Market Cap</span>
-                      <span class="detail-value">$2.85T</span>
-                    </div>
-                  </div>
-
-                  <div class="alert-section">
-                    <div class="alert-input">
-                      <label for="appleAlert">
-                        <i class="fas fa-bell"></i> Price Alert
-                      </label>
-                      <input
-                        type="number"
-                        id="appleAlert"
-                        placeholder="Set alert price"
-                        class="input-field"
-                        aria-label="Set price alert for Apple"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="wishlist-card-footer">
-                  <button class="btn-secondary btn-small">
-                    <i class="fas fa-chart-line"></i> View Details
-                  </button>
-                  <button class="btn-primary btn-small">
-                    <i class="fas fa-shopping-cart"></i> Add to Portfolio
-                  </button>
-                </div>
-              </article>
-
-              <article class="wishlist-card">
-                <div class="wishlist-card-header">
-                  <div class="asset-info">
-                    <h3 class="asset-symbol">GOOGL</h3>
-                    <p class="asset-name">Alphabet Inc.</p>
-                    <span class="asset-category">Technology</span>
-                  </div>
-                  <button
-                    class="btn-icon favorite active"
-                    aria-label="Remove from wishlist"
-                  >
-                    <i class="fas fa-star"></i>
-                  </button>
-                </div>
-
-                <div class="wishlist-card-body">
-                  <div class="price-info">
-                    <p class="current-price">$142.80</p>
-                    <span class="price-change negative">
-                      <i class="fas fa-arrow-down"></i> -1.25%
-                    </span>
-                  </div>
-
-                  <div class="price-details">
-                    <div class="detail-item">
-                      <span class="detail-label">Day Range</span>
-                      <span class="detail-value">$141.20 - $144.50</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">52W Range</span>
-                      <span class="detail-value">$102.30 - $155.20</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Market Cap</span>
-                      <span class="detail-value">$1.78T</span>
-                    </div>
-                  </div>
-
-                  <div class="alert-section">
-                    <div class="alert-input">
-                      <label for="googleAlert">
-                        <i class="fas fa-bell"></i> Price Alert
-                      </label>
-                      <input
-                        type="number"
-                        id="googleAlert"
-                        placeholder="Set alert price"
-                        class="input-field"
-                        aria-label="Set price alert for Alphabet"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="wishlist-card-footer">
-                  <button class="btn-secondary btn-small">
-                    <i class="fas fa-chart-line"></i> View Details
-                  </button>
-                  <button class="btn-primary btn-small">
-                    <i class="fas fa-shopping-cart"></i> Add to Portfolio
-                  </button>
-                </div>
-              </article>
+          <!-- Wishlist Table -->
+          <div class="section-card">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-bookmark"></i>
+                <h2>My Watchlist</h2>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table" id="wishlistTable">
+                <thead>
+                  <tr>
+                    <th>Asset</th>
+                    <th>Type</th>
+                    <th>Current Price</th>
+                    <th>Change</th>
+                    <th>Added Price</th>
+                    <th>Performance</th>
+                    <th>Target Price</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="wishlistTableBody">
+                  <!-- Dynamic content -->
+                </tbody>
+              </table>
             </div>
 
             <!-- Empty State -->
             <div class="empty-state" id="emptyWishlist" style="display: none">
-              <i class="fas fa-star-half-alt"></i>
+              <div class="empty-icon">
+                <i class="fas fa-star"></i>
+              </div>
               <h3>Your wishlist is empty</h3>
-              <p>
-                Start adding assets you're interested in to track their
-                performance
-              </p>
-              <button class="btn-primary" id="addFirstItem">
-                <i class="fas fa-plus"></i> Add First Item
+              <p>Start tracking assets you're interested in</p>
+              <button class="btn btn-primary" id="addFirstItem">
+                <i class="fas fa-plus"></i> Add Your First Asset
               </button>
             </div>
-          </section>
-
-          <!-- Market Trends -->
-          <section class="section-card" aria-labelledby="trends-heading">
-            <div class="section-header">
-              <div class="section-title">
-                <i class="fas fa-fire"></i>
-                <h2 id="trends-heading">Trending Assets</h2>
-              </div>
-            </div>
-            <div class="trending-grid">
-              <article class="trending-card">
-                <div class="trending-rank">1</div>
-                <div class="trending-info">
-                  <h3 class="trending-symbol">NVDA</h3>
-                  <p class="trending-name">NVIDIA Corporation</p>
-                </div>
-                <div class="trending-stats">
-                  <span class="trending-price">$512.40</span>
-                  <span class="trending-change positive">+5.8%</span>
-                </div>
-                <button
-                  class="btn-icon"
-                  onclick="
-                    addTrendingToWishlist('NVDA', 'NVIDIA Corporation', 'STOCK')
-                  "
-                  aria-label="Add NVIDIA to wishlist"
-                >
-                  <i class="far fa-star"></i>
-                </button>
-              </article>
-
-              <article class="trending-card">
-                <div class="trending-rank">2</div>
-                <div class="trending-info">
-                  <h3 class="trending-symbol">TSLA</h3>
-                  <p class="trending-name">Tesla Inc.</p>
-                </div>
-                <div class="trending-stats">
-                  <span class="trending-price">$248.50</span>
-                  <span class="trending-change positive">+3.2%</span>
-                </div>
-                <button
-                  class="btn-icon"
-                  onclick="addTrendingToWishlist('TSLA', 'Tesla Inc.', 'STOCK')"
-                  aria-label="Add Tesla to wishlist"
-                >
-                  <i class="far fa-star"></i>
-                </button>
-              </article>
-
-              <article class="trending-card">
-                <div class="trending-rank">3</div>
-                <div class="trending-info">
-                  <h3 class="trending-symbol">META</h3>
-                  <p class="trending-name">Meta Platforms</p>
-                </div>
-                <div class="trending-stats">
-                  <span class="trending-price">$385.20</span>
-                  <span class="trending-change positive">+2.1%</span>
-                </div>
-                <button
-                  class="btn-icon"
-                  onclick="
-                    addTrendingToWishlist('META', 'Meta Platforms', 'STOCK')
-                  "
-                  aria-label="Add Meta to wishlist"
-                >
-                  <i class="far fa-star"></i>
-                </button>
-              </article>
-            </div>
-          </section>
+          </div>
         </div>
 
         <!-- Footer -->
@@ -449,11 +275,201 @@
       </main>
     </div>
 
-    <!-- Common Modals -->
-    <div id="modals-container"></div>
+    <!-- Asset Details Modal -->
+    <div class="modal-overlay" id="assetDetailsModal" style="display: none">
+      <div class="modal-container modal-large">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <h2 id="modalAssetSymbol">AAPL</h2>
+            <span id="modalAssetName">Apple Inc.</span>
+          </div>
+          <button class="btn-icon modal-close" id="closeDetailsModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Price Overview -->
+          <div class="modal-stats">
+            <div class="stat-item">
+              <span class="stat-label">Current Price</span>
+              <span class="stat-value" id="modalCurrentPrice">$0.00</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Change</span>
+              <span class="stat-value" id="modalChange">0%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Added Price</span>
+              <span class="stat-value" id="modalAddedPrice">$0.00</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Since Added</span>
+              <span class="stat-value" id="modalPerformance">0%</span>
+            </div>
+          </div>
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay-container"></div>
+          <!-- Time Period Selector -->
+          <div class="chart-controls">
+            <div class="time-period-selector">
+              <button class="period-btn" data-period="1W">1W</button>
+              <button class="period-btn" data-period="1M">1M</button>
+              <button class="period-btn active" data-period="3M">3M</button>
+              <button class="period-btn" data-period="6M">6M</button>
+              <button class="period-btn" data-period="1Y">1Y</button>
+              <button class="period-btn" data-period="ALL">ALL</button>
+            </div>
+          </div>
+
+          <!-- Chart Stats -->
+          <div class="chart-stats" id="chartStatsContainer">
+            <!-- Populated dynamically -->
+          </div>
+
+          <!-- Performance Chart -->
+          <div class="chart-container">
+            <div class="chart-loading-overlay">
+              <div class="chart-spinner"></div>
+              <span>Loading chart data...</span>
+            </div>
+            <canvas id="assetPerformanceChart"></canvas>
+          </div>
+
+          <!-- Additional Info -->
+          <div class="asset-details-grid">
+            <div class="detail-card">
+              <i class="fas fa-calendar"></i>
+              <div>
+                <span class="detail-label">Added On</span>
+                <span class="detail-value" id="modalAddedDate">-</span>
+              </div>
+            </div>
+            <div class="detail-card">
+              <i class="fas fa-bullseye"></i>
+              <div>
+                <span class="detail-label">Target Price</span>
+                <span class="detail-value" id="modalTargetPrice">Not set</span>
+              </div>
+            </div>
+            <div class="detail-card">
+              <i class="fas fa-coins"></i>
+              <div>
+                <span class="detail-label">Currency</span>
+                <span class="detail-value" id="modalCurrency">USD</span>
+              </div>
+            </div>
+            <div class="detail-card">
+              <i class="fas fa-layer-group"></i>
+              <div>
+                <span class="detail-label">Category</span>
+                <span class="detail-value" id="modalCategory">Stock</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="modalRemoveBtn">
+            <i class="fas fa-trash"></i> Remove
+          </button>
+          <button class="btn btn-primary" id="modalAddToPortfolioBtn">
+            <i class="fas fa-plus"></i> Add to Portfolio
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add to Portfolio Modal -->
+    <div class="modal-overlay" id="addToPortfolioModal" style="display: none">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2><i class="fas fa-folder-plus"></i> Add to Portfolio</h2>
+          <button class="btn-icon modal-close" id="closePortfolioModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="addToPortfolioForm">
+            <div class="form-group">
+              <label>Asset</label>
+              <input type="text" id="portfolioAssetName" class="form-input" readonly />
+              <input type="hidden" id="portfolioAssetSymbol" />
+              <input type="hidden" id="portfolioAssetType" />
+              <input type="hidden" id="portfolioWishlistItemId" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="portfolioQuantity">
+                  <i class="fas fa-hashtag"></i> Quantity
+                </label>
+                <input
+                  type="number"
+                  id="portfolioQuantity"
+                  class="form-input"
+                  min="0.001"
+                  step="0.001"
+                  placeholder="Enter quantity"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="portfolioPurchasePrice">
+                  <i class="fas fa-dollar-sign"></i> Purchase Price
+                </label>
+                <input
+                  type="number"
+                  id="portfolioPurchasePrice"
+                  class="form-input"
+                  min="0.01"
+                  step="0.01"
+                  placeholder="Price per unit"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="portfolioCurrentPrice">
+                  <i class="fas fa-chart-line"></i> Current Price
+                </label>
+                <input
+                  type="number"
+                  id="portfolioCurrentPrice"
+                  class="form-input"
+                  min="0.01"
+                  step="0.01"
+                  placeholder="Current price"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="portfolioPurchaseDate">
+                  <i class="fas fa-calendar"></i> Purchase Date
+                </label>
+                <input
+                  type="date"
+                  id="portfolioPurchaseDate"
+                  class="form-input"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="removeFromWishlist" checked />
+                <span>Remove from wishlist after adding</span>
+              </label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelPortfolioAdd">
+            Cancel
+          </button>
+          <button type="submit" form="addToPortfolioForm" class="btn btn-primary">
+            <i class="fas fa-check"></i> Add to Portfolio
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="toast" role="alert" aria-live="polite"></div>
