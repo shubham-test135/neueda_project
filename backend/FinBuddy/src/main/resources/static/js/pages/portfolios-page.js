@@ -38,6 +38,12 @@ function setupEventListeners() {
   if (portfolioForm) {
     portfolioForm.addEventListener("submit", handleCreatePortfolio);
   }
+
+  // Edit portfolio form submission
+  const editPortfolioForm = document.getElementById("editPortfolioForm");
+  if (editPortfolioForm) {
+    editPortfolioForm.addEventListener("submit", handleEditPortfolio);
+  }
 }
 
 async function loadPortfolios() {
@@ -157,10 +163,73 @@ async function handleCreatePortfolio(e) {
   }
 }
 
+async function handleEditPortfolio(e) {
+  e.preventDefault();
+
+  const portfolioId = document.getElementById("editPortfolioId").value;
+  const formData = {
+    name: document.getElementById("editPortfolioName").value,
+    description: document.getElementById("editPortfolioDescription").value,
+    baseCurrency: document.getElementById("editPortfolioBaseCurrency").value,
+  };
+
+  showLoading();
+  try {
+    await portfolioAPI.update(portfolioId, formData);
+    showToast("Portfolio updated successfully", "success");
+
+    // Close modal
+    const modal = document.getElementById("editPortfolioModal");
+    modal.classList.remove("active");
+    modal.style.display = "none";
+
+    // Reset form
+    e.target.reset();
+
+    // Reload portfolios
+    await loadPortfolios();
+
+    // Refresh navbar dropdown
+    if (typeof window.refreshPortfolioDropdown === "function") {
+      await window.refreshPortfolioDropdown();
+    }
+
+    hideLoading();
+  } catch (error) {
+    console.error("Error updating portfolio:", error);
+    showToast("Failed to update portfolio", "error");
+    hideLoading();
+  }
+}
+
 // Global functions for card actions
 window.editPortfolio = async function (id) {
-  console.log("Edit portfolio:", id);
-  // TODO: Implement edit functionality
+  showLoading();
+  try {
+    // Fetch portfolio details
+    const portfolio = await portfolioAPI.getById(id);
+
+    // Populate form
+    document.getElementById("editPortfolioId").value = portfolio.id;
+    document.getElementById("editPortfolioName").value = portfolio.name;
+    document.getElementById("editPortfolioDescription").value =
+      portfolio.description || "";
+    document.getElementById("editPortfolioBaseCurrency").value =
+      portfolio.baseCurrency;
+
+    // Open modal
+    const modal = document.getElementById("editPortfolioModal");
+    if (modal) {
+      modal.classList.add("active");
+      modal.style.display = "flex";
+    }
+
+    hideLoading();
+  } catch (error) {
+    console.error("Error loading portfolio:", error);
+    showToast("Failed to load portfolio details", "error");
+    hideLoading();
+  }
 };
 
 window.deletePortfolio = async function (id) {

@@ -21,7 +21,17 @@ async function apiCall(endpoint, options = {}) {
     const response = await fetch(url, config);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // Try to get the error message from response body
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch (e) {
+        // If can't parse JSON, use default message
+      }
+      throw new Error(errorMessage);
     }
 
     if (response.status === 204) {
@@ -91,6 +101,10 @@ export const assetAPI = {
   delete: (id) =>
     apiCall(`/assets/${id}`, {
       method: "DELETE",
+    }),
+  sell: (id, quantityToSell) =>
+    apiCall(`/assets/${id}/sell?quantityToSell=${quantityToSell}`, {
+      method: "POST",
     }),
   search: (query) =>
     apiCall(`/assets/search?query=${encodeURIComponent(query)}`),

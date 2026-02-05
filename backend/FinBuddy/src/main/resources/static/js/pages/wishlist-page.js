@@ -80,14 +80,14 @@ async function silentRefreshPrices() {
 
 // Check for triggered alerts and notify user
 function checkAlerts() {
-  const triggeredAlerts = wishlistItems.filter(item =>
-    item.alertTriggered && item.alertEnabled
+  const triggeredAlerts = wishlistItems.filter(
+    (item) => item.alertTriggered && item.alertEnabled,
   );
 
-  triggeredAlerts.forEach(item => {
+  triggeredAlerts.forEach((item) => {
     showToast(
       `🔔 Alert: ${item.symbol} has reached your target price of ${formatCurrency(item.targetPrice, item.currency)}!`,
-      "success"
+      "success",
     );
   });
 }
@@ -95,15 +95,25 @@ function checkAlerts() {
 // ===== Event Listeners =====
 function setupEventListeners() {
   // Add to wishlist buttons
-  document.getElementById("addToWishlistBtn")?.addEventListener("click", toggleAddForm);
-  document.getElementById("addFirstItem")?.addEventListener("click", toggleAddForm);
+  document
+    .getElementById("addToWishlistBtn")
+    ?.addEventListener("click", toggleAddForm);
+  document
+    .getElementById("addFirstItem")
+    ?.addEventListener("click", toggleAddForm);
 
   // Cancel buttons
-  document.getElementById("cancelWishlistBtn")?.addEventListener("click", hideAddForm);
-  document.getElementById("cancelWishlistBtn2")?.addEventListener("click", hideAddForm);
+  document
+    .getElementById("cancelWishlistBtn")
+    ?.addEventListener("click", hideAddForm);
+  document
+    .getElementById("cancelWishlistBtn2")
+    ?.addEventListener("click", hideAddForm);
 
   // Form submission
-  document.getElementById("wishlistForm")?.addEventListener("submit", handleAddToWishlist);
+  document
+    .getElementById("wishlistForm")
+    ?.addEventListener("submit", handleAddToWishlist);
 
   // Search input with debounce
   const nameInput = document.getElementById("wishlistAssetName");
@@ -113,39 +123,65 @@ function setupEventListeners() {
 
     document.addEventListener("click", (e) => {
       const results = document.getElementById("wishlistSearchResults");
-      if (results && !nameInput.contains(e.target) && !results.contains(e.target)) {
+      if (
+        results &&
+        !nameInput.contains(e.target) &&
+        !results.contains(e.target)
+      ) {
         results.style.display = "none";
       }
     });
   }
 
   // Asset type change triggers new search
-  document.getElementById("wishlistAssetType")?.addEventListener("change", () => {
-    const query = document.getElementById("wishlistAssetName")?.value;
-    if (query?.length >= 2) searchAssets(query);
-    document.getElementById("wishlistAssetSymbol").value = "";
-  });
+  document
+    .getElementById("wishlistAssetType")
+    ?.addEventListener("change", () => {
+      const query = document.getElementById("wishlistAssetName")?.value;
+      if (query?.length >= 2) searchAssets(query);
+      document.getElementById("wishlistAssetSymbol").value = "";
+    });
 
   // Filter and search
-  document.getElementById("wishlistSearch")?.addEventListener("input", filterWishlist);
-  document.getElementById("categoryFilter")?.addEventListener("change", filterWishlist);
+  document
+    .getElementById("wishlistSearch")
+    ?.addEventListener("input", filterWishlist);
+  document
+    .getElementById("categoryFilter")
+    ?.addEventListener("change", filterWishlist);
   document.getElementById("sortBy")?.addEventListener("change", sortWishlist);
 
   // Refresh prices
-  document.getElementById("refreshPricesBtn")?.addEventListener("click", refreshPrices);
+  document
+    .getElementById("refreshPricesBtn")
+    ?.addEventListener("click", refreshPrices);
 
   // Modal event listeners
-  document.getElementById("closeDetailsModal")?.addEventListener("click", closeDetailsModal);
-  document.getElementById("closePortfolioModal")?.addEventListener("click", closePortfolioModal);
-  document.getElementById("cancelPortfolioAdd")?.addEventListener("click", closePortfolioModal);
-  document.getElementById("modalRemoveBtn")?.addEventListener("click", handleModalRemove);
-  document.getElementById("modalAddToPortfolioBtn")?.addEventListener("click", openAddToPortfolioModal);
-  document.getElementById("addToPortfolioForm")?.addEventListener("submit", handleAddToPortfolio);
+  document
+    .getElementById("closeDetailsModal")
+    ?.addEventListener("click", closeDetailsModal);
+  document
+    .getElementById("closePortfolioModal")
+    ?.addEventListener("click", closePortfolioModal);
+  document
+    .getElementById("cancelPortfolioAdd")
+    ?.addEventListener("click", closePortfolioModal);
+  document
+    .getElementById("modalRemoveBtn")
+    ?.addEventListener("click", handleModalRemove);
+  document
+    .getElementById("modalAddToPortfolioBtn")
+    ?.addEventListener("click", openAddToPortfolioModal);
+  document
+    .getElementById("addToPortfolioForm")
+    ?.addEventListener("submit", handleAddToPortfolio);
 
   // Time period selector
-  document.querySelectorAll(".period-btn").forEach(btn => {
+  document.querySelectorAll(".period-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      document.querySelectorAll(".period-btn").forEach(b => b.classList.remove("active"));
+      document
+        .querySelectorAll(".period-btn")
+        .forEach((b) => b.classList.remove("active"));
       e.target.classList.add("active");
       if (currentAssetData) {
         updateChart(currentAssetData.symbol, e.target.dataset.period);
@@ -154,12 +190,16 @@ function setupEventListeners() {
   });
 
   // Close modals on overlay click
-  document.getElementById("assetDetailsModal")?.addEventListener("click", (e) => {
-    if (e.target.id === "assetDetailsModal") closeDetailsModal();
-  });
-  document.getElementById("addToPortfolioModal")?.addEventListener("click", (e) => {
-    if (e.target.id === "addToPortfolioModal") closePortfolioModal();
-  });
+  document
+    .getElementById("assetDetailsModal")
+    ?.addEventListener("click", (e) => {
+      if (e.target.id === "assetDetailsModal") closeDetailsModal();
+    });
+  document
+    .getElementById("addToPortfolioModal")
+    ?.addEventListener("click", (e) => {
+      if (e.target.id === "addToPortfolioModal") closePortfolioModal();
+    });
 }
 
 // ===== Load Wishlist =====
@@ -167,7 +207,7 @@ async function loadWishlist() {
   showLoading(true);
   try {
     const response = await wishlistAPI.getAll(currentPortfolioId);
-    wishlistItems = response?.success ? (response.data || []) : [];
+    wishlistItems = response?.success ? response.data || [] : [];
     await updateSummary();
     renderWishlist();
   } catch (error) {
@@ -182,16 +222,11 @@ async function loadWishlist() {
 
 // ===== Update Summary =====
 async function updateSummary() {
-  console.log("Updating summary for portfolio:", currentPortfolioId);
-  console.log("Current wishlist items:", wishlistItems.length);
-
   try {
     const response = await wishlistAPI.getSummary(currentPortfolioId);
-    console.log("Summary API response:", response);
 
     if (response?.success && response.data) {
       const s = response.data;
-      console.log("API Summary data:", s);
 
       // Update card values with element checks
       updateCardValue("totalWatchlist", s.totalWatchlist || 0);
@@ -199,18 +234,18 @@ async function updateSummary() {
       updateCardValue("losersCount", s.losersCount || 0);
       updateCardValue("alertsCount", s.alertsCount || 0);
 
-      console.log("Cards updated from API");
-
       // Show alert icon animation if there are triggered alerts
-      const triggeredCount = wishlistItems.filter(i => i.alertTriggered).length;
-      const alertsCard = document.querySelector('.card-icon.gradient-orange');
+      const triggeredCount = wishlistItems.filter(
+        (i) => i.alertTriggered,
+      ).length;
+      const alertsCard = document.querySelector(".card-icon.gradient-orange");
       if (alertsCard) {
         if (triggeredCount > 0) {
-          alertsCard.classList.add('alert-pulse');
+          alertsCard.classList.add("alert-pulse");
           alertsCard.title = `${triggeredCount} alert(s) triggered!`;
         } else {
-          alertsCard.classList.remove('alert-pulse');
-          alertsCard.title = 'Active price alerts';
+          alertsCard.classList.remove("alert-pulse");
+          alertsCard.title = "Active price alerts";
         }
       }
     } else {
@@ -231,7 +266,6 @@ function updateCardValue(elementId, value) {
   const element = document.getElementById(elementId);
   if (element) {
     element.textContent = value;
-    console.log(`Updated ${elementId} to:`, value);
   } else {
     console.error(`Element not found: ${elementId}`);
   }
@@ -239,23 +273,15 @@ function updateCardValue(elementId, value) {
 
 // Fallback summary calculation
 function updateSummaryFallback() {
-  console.log("Using fallback calculation");
-
   const totalWatchlist = wishlistItems.length;
-  const gainers = wishlistItems.filter(i => {
+  const gainers = wishlistItems.filter((i) => {
     const change = i.changePercentage || 0;
-    console.log(`${i.symbol}: changePercentage = ${change}`);
     return change > 0;
   }).length;
-  const losers = wishlistItems.filter(i => (i.changePercentage || 0) < 0).length;
-  const alerts = wishlistItems.filter(i => i.alertEnabled).length;
-
-  console.log("Fallback calculations:", {
-    totalWatchlist,
-    gainers,
-    losers,
-    alerts
-  });
+  const losers = wishlistItems.filter(
+    (i) => (i.changePercentage || 0) < 0,
+  ).length;
+  const alerts = wishlistItems.filter((i) => i.alertEnabled).length;
 
   updateCardValue("totalWatchlist", totalWatchlist);
   updateCardValue("gainersCount", gainers);
@@ -287,27 +313,42 @@ function renderWishlist() {
   table.style.display = "table";
   empty.style.display = "none";
 
-  tbody.innerHTML = wishlistItems.map(item => {
-    const change = item.changePercentage || 0;
-    const performance = item.performanceSinceAdded || 0;
-    const changeClass = change >= 0 ? "positive" : "negative";
-    const perfClass = performance >= 0 ? "positive" : "negative";
-    const typeClass = (item.category || "stock").toLowerCase().replace(" ", "_");
+  tbody.innerHTML = wishlistItems
+    .map((item) => {
+      const change = item.changePercentage || 0;
+      const performance = item.performanceSinceAdded || 0;
+      const changeClass = change >= 0 ? "positive" : "negative";
+      const perfClass = performance >= 0 ? "positive" : "negative";
+      const typeClass = (item.category || "stock")
+        .toLowerCase()
+        .replace(" ", "_");
 
-    // Alert status
-    const alertTriggered = item.alertTriggered && item.alertEnabled;
-    const alertActive = item.alertEnabled && !item.alertTriggered;
-    const alertClass = alertTriggered ? "alert-triggered" : (alertActive ? "alert-active" : "");
-    const alertIcon = alertTriggered ? "fa-bell-slash" : (alertActive ? "fa-bell" : "fa-bell");
-    const alertColor = alertTriggered ? "#ef4444" : (alertActive ? "#f59e0b" : "#94a3b8");
+      // Alert status
+      const alertTriggered = item.alertTriggered && item.alertEnabled;
+      const alertActive = item.alertEnabled && !item.alertTriggered;
+      const alertClass = alertTriggered
+        ? "alert-triggered"
+        : alertActive
+          ? "alert-active"
+          : "";
+      const alertIcon = alertTriggered
+        ? "fa-bell-slash"
+        : alertActive
+          ? "fa-bell"
+          : "fa-bell";
+      const alertColor = alertTriggered
+        ? "#ef4444"
+        : alertActive
+          ? "#f59e0b"
+          : "#94a3b8";
 
-    // Format target price with conversion
-    const targetDisplay = item.targetPrice
-      ? formatCurrency(item.targetPrice, item.currency)
-      : "-";
+      // Format target price with conversion
+      const targetDisplay = item.targetPrice
+        ? formatCurrency(item.targetPrice, item.currency)
+        : "-";
 
-    return `
-      <tr data-id="${item.id}" class="${alertTriggered ? 'row-alert-triggered' : ''}">
+      return `
+      <tr data-id="${item.id}" class="${alertTriggered ? "row-alert-triggered" : ""}">
         <td>
           <div class="asset-cell clickable" onclick="viewDetails(${item.id})" title="Click to view chart">
             <div class="asset-icon">${(item.symbol || "?").substring(0, 2)}</div>
@@ -334,12 +375,12 @@ function renderWishlist() {
         <td>
           <div class="target-cell ${alertClass}">
             <i class="fas ${alertIcon}" style="color: ${alertColor}; margin-right: 6px;" 
-               title="${alertTriggered ? 'Alert Triggered!' : (alertActive ? 'Alert Active' : 'No Alert')}"></i>
+               title="${alertTriggered ? "Alert Triggered!" : alertActive ? "Alert Active" : "No Alert"}"></i>
             <input type="number" step="0.01" value="${item.targetPrice || ""}" 
               placeholder="Set target" 
               onchange="updateTargetPrice(${item.id}, this.value)"
-              class="${alertTriggered ? 'input-triggered' : ''}"/>
-            ${alertTriggered ? '<span class="alert-badge">Triggered!</span>' : ''}
+              class="${alertTriggered ? "input-triggered" : ""}"/>
+            ${alertTriggered ? '<span class="alert-badge">Triggered!</span>' : ""}
           </div>
         </td>
         <td>
@@ -357,16 +398,17 @@ function renderWishlist() {
         </td>
       </tr>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 function formatCategory(category) {
   if (!category) return "Stock";
   const map = {
-    "STOCK": "Stock",
-    "BOND": "Bond",
-    "MUTUAL_FUND": "Mutual Fund",
-    "SIP": "SIP"
+    STOCK: "Stock",
+    BOND: "Bond",
+    MUTUAL_FUND: "Mutual Fund",
+    SIP: "SIP",
   };
   return map[category.toUpperCase()] || category;
 }
@@ -391,9 +433,11 @@ async function handleAddToWishlist(e) {
 
   try {
     const requestData = {
-      symbol: document.getElementById("wishlistAssetSymbol").value.toUpperCase(),
+      symbol: document
+        .getElementById("wishlistAssetSymbol")
+        .value.toUpperCase(),
       category: document.getElementById("wishlistAssetType").value,
-      targetPrice: document.getElementById("wishlistTargetPrice").value || null
+      targetPrice: document.getElementById("wishlistTargetPrice").value || null,
     };
 
     const response = await wishlistAPI.add(currentPortfolioId, requestData);
@@ -427,11 +471,20 @@ async function searchAssets(query) {
     let data;
 
     switch (assetType) {
-      case "STOCK": data = await marketAPI.searchStocks(query); break;
-      case "BOND": data = await marketAPI.searchBonds(query); break;
-      case "MUTUAL_FUND": data = await marketAPI.searchMutualFunds(query); break;
-      case "SIP": data = await marketAPI.searchSIPs(query); break;
-      default: data = await marketAPI.searchAllAssets(query);
+      case "STOCK":
+        data = await marketAPI.searchStocks(query);
+        break;
+      case "BOND":
+        data = await marketAPI.searchBonds(query);
+        break;
+      case "MUTUAL_FUND":
+        data = await marketAPI.searchMutualFunds(query);
+        break;
+      case "SIP":
+        data = await marketAPI.searchSIPs(query);
+        break;
+      default:
+        data = await marketAPI.searchAllAssets(query);
     }
 
     displaySearchResults(data);
@@ -445,26 +498,32 @@ function displaySearchResults(results) {
   const container = document.getElementById("wishlistSearchResults");
 
   if (!results || results.length === 0) {
-    container.innerHTML = '<div class="search-result-item no-results">No results found</div>';
+    container.innerHTML =
+      '<div class="search-result-item no-results">No results found</div>';
     container.style.display = "block";
     return;
   }
 
-  container.innerHTML = results.slice(0, 10).map(r => {
-    const type = r.type || "Stock";
-    const typeClass = type.toLowerCase().replace(" ", "-");
-    const name = (r.name || "").replace(/'/g, "\\'");
+  container.innerHTML = results
+    .slice(0, 10)
+    .map((r) => {
+      const type = r.type || "Stock";
+      const typeClass = type.toLowerCase().replace(" ", "-");
+      const name = (r.name || "").replace(/'/g, "\\'");
 
-    let extra = "";
-    if (type.toUpperCase() === "BOND") {
-      extra = `<span class="result-extra">${r.creditRating || ""} | ${r.couponRate}%</span>`;
-    } else if (type.toUpperCase().includes("MUTUAL") || type.toUpperCase() === "SIP") {
-      extra = `<span class="result-extra">${r.fundHouse || ""}</span>`;
-    } else {
-      extra = `<span class="result-extra">${r.sector || r.exchange || ""}</span>`;
-    }
+      let extra = "";
+      if (type.toUpperCase() === "BOND") {
+        extra = `<span class="result-extra">${r.creditRating || ""} | ${r.couponRate}%</span>`;
+      } else if (
+        type.toUpperCase().includes("MUTUAL") ||
+        type.toUpperCase() === "SIP"
+      ) {
+        extra = `<span class="result-extra">${r.fundHouse || ""}</span>`;
+      } else {
+        extra = `<span class="result-extra">${r.sector || r.exchange || ""}</span>`;
+      }
 
-    return `
+      return `
       <div class="search-result-item" onclick="selectAsset('${r.symbol}', '${name}', '${type}')">
         <div class="result-main">
           <span class="result-symbol">${r.symbol}</span>
@@ -477,7 +536,8 @@ function displaySearchResults(results) {
         </div>
       </div>
     `;
-  }).join("");
+    })
+    .join("");
 
   container.style.display = "block";
 }
@@ -486,27 +546,39 @@ function selectAsset(symbol, name, type) {
   document.getElementById("wishlistAssetSymbol").value = symbol;
   document.getElementById("wishlistAssetName").value = name;
 
-  const typeMap = { "stock": "STOCK", "bond": "BOND", "mutual fund": "MUTUAL_FUND", "sip": "SIP" };
-  document.getElementById("wishlistAssetType").value = typeMap[type.toLowerCase()] || "STOCK";
+  const typeMap = {
+    stock: "STOCK",
+    bond: "BOND",
+    "mutual fund": "MUTUAL_FUND",
+    sip: "SIP",
+  };
+  document.getElementById("wishlistAssetType").value =
+    typeMap[type.toLowerCase()] || "STOCK";
   document.getElementById("wishlistSearchResults").style.display = "none";
 }
 
 // ===== Filter & Sort =====
 function filterWishlist() {
-  const search = document.getElementById("wishlistSearch").value.toLowerCase().trim();
+  const search = document
+    .getElementById("wishlistSearch")
+    .value.toLowerCase()
+    .trim();
   const category = document.getElementById("categoryFilter").value;
 
   let filtered = [...wishlistItems];
 
   if (search) {
-    filtered = filtered.filter(i =>
-      (i.symbol || "").toLowerCase().includes(search) ||
-      (i.name || "").toLowerCase().includes(search)
+    filtered = filtered.filter(
+      (i) =>
+        (i.symbol || "").toLowerCase().includes(search) ||
+        (i.name || "").toLowerCase().includes(search),
     );
   }
 
   if (category && category !== "all") {
-    filtered = filtered.filter(i => (i.category || "").toLowerCase() === category.toLowerCase());
+    filtered = filtered.filter(
+      (i) => (i.category || "").toLowerCase() === category.toLowerCase(),
+    );
   }
 
   const original = wishlistItems;
@@ -520,16 +592,24 @@ function sortWishlist() {
 
   switch (sortBy) {
     case "name":
-      wishlistItems.sort((a, b) => (a.symbol || "").localeCompare(b.symbol || ""));
+      wishlistItems.sort((a, b) =>
+        (a.symbol || "").localeCompare(b.symbol || ""),
+      );
       break;
     case "price":
-      wishlistItems.sort((a, b) => (b.currentPrice || 0) - (a.currentPrice || 0));
+      wishlistItems.sort(
+        (a, b) => (b.currentPrice || 0) - (a.currentPrice || 0),
+      );
       break;
     case "change":
-      wishlistItems.sort((a, b) => (b.changePercentage || 0) - (a.changePercentage || 0));
+      wishlistItems.sort(
+        (a, b) => (b.changePercentage || 0) - (a.changePercentage || 0),
+      );
       break;
     case "added":
-      wishlistItems.sort((a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
+      wishlistItems.sort(
+        (a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0),
+      );
       break;
   }
   renderWishlist();
@@ -560,11 +640,11 @@ async function updateTargetPrice(itemId, price) {
     const targetPrice = price ? parseFloat(price) : null;
 
     const response = await wishlistAPI.update(currentPortfolioId, itemId, {
-      targetPrice: targetPrice
+      targetPrice: targetPrice,
     });
 
     if (response?.success) {
-      const item = wishlistItems.find(i => i.id === itemId);
+      const item = wishlistItems.find((i) => i.id === itemId);
       if (item) {
         item.targetPrice = targetPrice;
         item.alertEnabled = targetPrice !== null;
@@ -575,7 +655,10 @@ async function updateTargetPrice(itemId, price) {
       renderWishlist(); // Re-render to update alert icons
 
       if (targetPrice) {
-        showToast(`Alert set: You'll be notified when price reaches ${formatCurrency(targetPrice, item?.currency)}`, "success");
+        showToast(
+          `Alert set: You'll be notified when price reaches ${formatCurrency(targetPrice, item?.currency)}`,
+          "success",
+        );
       } else {
         showToast("Price alert removed", "info");
       }
@@ -604,32 +687,45 @@ async function refreshPrices() {
 
 // ===== View Details Modal =====
 function viewDetails(itemId) {
-  const item = wishlistItems.find(i => i.id === itemId);
+  const item = wishlistItems.find((i) => i.id === itemId);
   if (!item) return;
 
   currentAssetData = item;
 
   // Populate modal
   document.getElementById("modalAssetSymbol").textContent = item.symbol;
-  document.getElementById("modalAssetName").textContent = item.name || item.symbol;
-  document.getElementById("modalCurrentPrice").textContent = formatCurrency(item.currentPrice || 0, item.currency);
+  document.getElementById("modalAssetName").textContent =
+    item.name || item.symbol;
+  document.getElementById("modalCurrentPrice").textContent = formatCurrency(
+    item.currentPrice || 0,
+    item.currency,
+  );
 
   const change = item.changePercentage || 0;
   const changeEl = document.getElementById("modalChange");
   changeEl.textContent = `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`;
   changeEl.className = `stat-value ${change >= 0 ? "positive" : "negative"}`;
 
-  document.getElementById("modalAddedPrice").textContent = formatCurrency(item.priceWhenAdded || 0, item.currency);
+  document.getElementById("modalAddedPrice").textContent = formatCurrency(
+    item.priceWhenAdded || 0,
+    item.currency,
+  );
 
   const perf = item.performanceSinceAdded || 0;
   const perfEl = document.getElementById("modalPerformance");
   perfEl.textContent = `${perf >= 0 ? "+" : ""}${perf.toFixed(2)}%`;
   perfEl.className = `stat-value ${perf >= 0 ? "positive" : "negative"}`;
 
-  document.getElementById("modalAddedDate").textContent = item.addedAt ? new Date(item.addedAt).toLocaleDateString() : "-";
-  document.getElementById("modalTargetPrice").textContent = item.targetPrice ? formatCurrency(item.targetPrice, item.currency) : "Not set";
+  document.getElementById("modalAddedDate").textContent = item.addedAt
+    ? new Date(item.addedAt).toLocaleDateString()
+    : "-";
+  document.getElementById("modalTargetPrice").textContent = item.targetPrice
+    ? formatCurrency(item.targetPrice, item.currency)
+    : "Not set";
   document.getElementById("modalCurrency").textContent = item.currency || "USD";
-  document.getElementById("modalCategory").textContent = formatCategory(item.category);
+  document.getElementById("modalCategory").textContent = formatCategory(
+    item.category,
+  );
 
   // Show modal
   document.getElementById("assetDetailsModal").style.display = "flex";
@@ -654,12 +750,12 @@ function handleModalRemove() {
 const FINNHUB_API_KEY = "d5vg7hpr01qjj9jjd8k0d5vg7hpr01qjj9jjd8kg";
 
 async function updateChart(symbol, period) {
-  const chartContainer = document.querySelector('.chart-container');
+  const chartContainer = document.querySelector(".chart-container");
   const ctx = document.getElementById("assetPerformanceChart").getContext("2d");
 
   // Show loading state
   if (chartContainer) {
-    chartContainer.classList.add('chart-loading');
+    chartContainer.classList.add("chart-loading");
   }
 
   try {
@@ -671,7 +767,9 @@ async function updateChart(symbol, period) {
     }
 
     const isPositive = data.values[data.values.length - 1] >= data.values[0];
-    const gradientColor = isPositive ? "rgba(16, 185, 129, " : "rgba(239, 68, 68, ";
+    const gradientColor = isPositive
+      ? "rgba(16, 185, 129, "
+      : "rgba(239, 68, 68, ";
 
     const gradient = ctx.createLinearGradient(0, 0, 0, 280);
     gradient.addColorStop(0, gradientColor + "0.3)");
@@ -686,33 +784,42 @@ async function updateChart(symbol, period) {
     const lowPrice = Math.min(...data.values);
 
     // Update chart stats display
-    updateChartStats(startPrice, endPrice, highPrice, lowPrice, percentChange, period);
+    updateChartStats(
+      startPrice,
+      endPrice,
+      highPrice,
+      lowPrice,
+      percentChange,
+      period,
+    );
 
     performanceChart = new Chart(ctx, {
       type: "line",
       data: {
         labels: data.labels,
-        datasets: [{
-          label: symbol,
-          data: data.values,
-          fill: true,
-          backgroundColor: gradient,
-          borderColor: isPositive ? "#10b981" : "#ef4444",
-          borderWidth: 2,
-          tension: 0.3,
-          pointRadius: 0,
-          pointHoverRadius: 6,
-          pointHoverBackgroundColor: isPositive ? "#10b981" : "#ef4444",
-          pointHoverBorderColor: "#fff",
-          pointHoverBorderWidth: 2
-        }]
+        datasets: [
+          {
+            label: symbol,
+            data: data.values,
+            fill: true,
+            backgroundColor: gradient,
+            borderColor: isPositive ? "#10b981" : "#ef4444",
+            borderWidth: 2,
+            tension: 0.3,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: isPositive ? "#10b981" : "#ef4444",
+            pointHoverBorderColor: "#fff",
+            pointHoverBorderWidth: 2,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         interaction: {
           intersect: false,
-          mode: "index"
+          mode: "index",
         },
         plugins: {
           legend: { display: false },
@@ -727,14 +834,17 @@ async function updateChart(symbol, period) {
               title: (ctx) => ctx[0].label,
               label: (ctx) => {
                 const price = ctx.parsed.y.toFixed(2);
-                const changeFromStart = ((ctx.parsed.y - startPrice) / startPrice * 100).toFixed(2);
+                const changeFromStart = (
+                  ((ctx.parsed.y - startPrice) / startPrice) *
+                  100
+                ).toFixed(2);
                 return [
                   `Price: $${price}`,
-                  `Change: ${changeFromStart >= 0 ? '+' : ''}${changeFromStart}%`
+                  `Change: ${changeFromStart >= 0 ? "+" : ""}${changeFromStart}%`,
                 ];
-              }
-            }
-          }
+              },
+            },
+          },
         },
         scales: {
           x: {
@@ -742,33 +852,40 @@ async function updateChart(symbol, period) {
             ticks: {
               color: "#94a3b8",
               maxTicksLimit: 8,
-              font: { size: 11 }
-            }
+              font: { size: 11 },
+            },
           },
           y: {
             grid: { color: "rgba(148, 163, 184, 0.08)" },
             ticks: {
               color: "#94a3b8",
               font: { size: 11 },
-              callback: (value) => "$" + value.toFixed(0)
-            }
-          }
-        }
-      }
+              callback: (value) => "$" + value.toFixed(0),
+            },
+          },
+        },
+      },
     });
   } catch (error) {
     console.error("Error updating chart:", error);
     showToast("Failed to load chart data", "error");
   } finally {
     if (chartContainer) {
-      chartContainer.classList.remove('chart-loading');
+      chartContainer.classList.remove("chart-loading");
     }
   }
 }
 
 // Update chart statistics display
-function updateChartStats(startPrice, endPrice, highPrice, lowPrice, percentChange, period) {
-  const statsContainer = document.getElementById('chartStatsContainer');
+function updateChartStats(
+  startPrice,
+  endPrice,
+  highPrice,
+  lowPrice,
+  percentChange,
+  period,
+) {
+  const statsContainer = document.getElementById("chartStatsContainer");
   if (!statsContainer) return;
 
   const periodLabels = {
@@ -777,7 +894,7 @@ function updateChartStats(startPrice, endPrice, highPrice, lowPrice, percentChan
     "3M": "3 Months",
     "6M": "6 Months",
     "1Y": "1 Year",
-    "ALL": "All Time"
+    ALL: "All Time",
   };
 
   statsContainer.innerHTML = `
@@ -799,8 +916,8 @@ function updateChartStats(startPrice, endPrice, highPrice, lowPrice, percentChan
     </div>
     <div class="chart-stat">
       <span class="chart-stat-label">Change</span>
-      <span class="chart-stat-value ${parseFloat(percentChange) >= 0 ? 'positive' : 'negative'}">
-        ${percentChange >= 0 ? '+' : ''}${percentChange}%
+      <span class="chart-stat-value ${parseFloat(percentChange) >= 0 ? "positive" : "negative"}">
+        ${percentChange >= 0 ? "+" : ""}${percentChange}%
       </span>
     </div>
   `;
@@ -808,15 +925,22 @@ function updateChartStats(startPrice, endPrice, highPrice, lowPrice, percentChan
 
 // Fetch historical data from Finnhub API
 async function fetchHistoricalData(symbol, period) {
-  const periods = { "1W": 7, "1M": 30, "3M": 90, "6M": 180, "1Y": 365, "ALL": 730 };
+  const periods = {
+    "1W": 7,
+    "1M": 30,
+    "3M": 90,
+    "6M": 180,
+    "1Y": 365,
+    ALL: 730,
+  };
   const days = periods[period] || 90;
 
-  const currentItem = wishlistItems.find(i => i.symbol === symbol);
+  const currentItem = wishlistItems.find((i) => i.symbol === symbol);
   const currentPrice = currentItem?.currentPrice || 100;
 
   // Calculate timestamps
   const now = Math.floor(Date.now() / 1000);
-  const from = now - (days * 24 * 60 * 60);
+  const from = now - days * 24 * 60 * 60;
 
   try {
     // Try to fetch real data from Finnhub
@@ -828,14 +952,24 @@ async function fetchHistoricalData(symbol, period) {
 
     if (data.s === "ok" && data.c && data.c.length > 0) {
       // Real data available
-      const labels = data.t.map(timestamp => {
+      const labels = data.t.map((timestamp) => {
         const date = new Date(timestamp * 1000);
         if (period === "1W") {
-          return date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+          return date.toLocaleDateString("en-US", {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+          });
         } else if (period === "1M") {
-          return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          return date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          });
         } else {
-          return date.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+          return date.toLocaleDateString("en-US", {
+            month: "short",
+            year: "2-digit",
+          });
         }
       });
 
@@ -860,18 +994,25 @@ async function fetchHistoricalData(symbol, period) {
 
 // Generate realistic simulated historical data
 function generateSimulatedData(symbol, period, currentPrice) {
-  const periods = { "1W": 7, "1M": 30, "3M": 90, "6M": 180, "1Y": 365, "ALL": 730 };
+  const periods = {
+    "1W": 7,
+    "1M": 30,
+    "3M": 90,
+    "6M": 180,
+    "1Y": 365,
+    ALL: 730,
+  };
   const days = periods[period] || 90;
 
   // Use symbol hash for consistent random data per symbol
-  const symbolHash = symbol.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const symbolHash = symbol.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   const seedRandom = (seed) => {
     const x = Math.sin(seed) * 10000;
     return x - Math.floor(x);
   };
 
   // Determine trend based on current performance
-  const currentItem = wishlistItems.find(i => i.symbol === symbol);
+  const currentItem = wishlistItems.find((i) => i.symbol === symbol);
   const trend = currentItem?.performanceSinceAdded > 0 ? 0.52 : 0.48;
 
   const volatility = 0.015 + (symbolHash % 10) * 0.002;
@@ -880,18 +1021,28 @@ function generateSimulatedData(symbol, period, currentPrice) {
   const values = [];
 
   // Start from a calculated historical price
-  let price = currentPrice / (1 + ((trend - 0.5) * days * volatility));
+  let price = currentPrice / (1 + (trend - 0.5) * days * volatility);
 
   for (let i = days; i >= 0; i--) {
     const date = new Date();
     date.setDate(date.getDate() - i);
 
     if (period === "1W") {
-      labels.push(date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }));
+      labels.push(
+        date.toLocaleDateString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        }),
+      );
     } else if (period === "1M") {
-      labels.push(date.toLocaleDateString("en-US", { month: "short", day: "numeric" }));
+      labels.push(
+        date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      );
     } else {
-      labels.push(date.toLocaleDateString("en-US", { month: "short", year: "2-digit" }));
+      labels.push(
+        date.toLocaleDateString("en-US", { month: "short", year: "2-digit" }),
+      );
     }
 
     // Generate price movement with trend
@@ -909,19 +1060,27 @@ function generateSimulatedData(symbol, period, currentPrice) {
 
 // ===== Add to Portfolio Modal =====
 function openPortfolioModal(itemId) {
-  const item = wishlistItems.find(i => i.id === itemId);
+  const item = wishlistItems.find((i) => i.id === itemId);
   if (!item) return;
 
   currentAssetData = item;
 
-  document.getElementById("portfolioAssetName").value = `${item.symbol} - ${item.name || item.symbol}`;
+  document.getElementById("portfolioAssetName").value =
+    `${item.symbol} - ${item.name || item.symbol}`;
   document.getElementById("portfolioAssetSymbol").value = item.symbol;
-  document.getElementById("portfolioAssetType").value = item.category || "STOCK";
+  document.getElementById("portfolioAssetType").value =
+    item.category || "STOCK";
   document.getElementById("portfolioWishlistItemId").value = item.id;
-  document.getElementById("portfolioCurrentPrice").value = item.currentPrice || "";
-  document.getElementById("portfolioPurchasePrice").value = item.currentPrice || "";
-  document.getElementById("portfolioPurchaseDate").value = new Date().toISOString().split("T")[0];
-  document.getElementById("portfolioPurchaseDate").max = new Date().toISOString().split("T")[0];
+  document.getElementById("portfolioCurrentPrice").value =
+    item.currentPrice || "";
+  document.getElementById("portfolioPurchasePrice").value =
+    item.currentPrice || "";
+  document.getElementById("portfolioPurchaseDate").value = new Date()
+    .toISOString()
+    .split("T")[0];
+  document.getElementById("portfolioPurchaseDate").max = new Date()
+    .toISOString()
+    .split("T")[0];
 
   document.getElementById("addToPortfolioModal").style.display = "flex";
 }
@@ -944,25 +1103,36 @@ async function handleAddToPortfolio(e) {
 
   try {
     const assetType = document.getElementById("portfolioAssetType").value;
-    const wishlistItemId = document.getElementById("portfolioWishlistItemId").value;
+    const wishlistItemId = document.getElementById(
+      "portfolioWishlistItemId",
+    ).value;
 
     const assetData = {
       portfolioId: currentPortfolioId,
       assetType: assetType,
-      name: currentAssetData?.name || document.getElementById("portfolioAssetSymbol").value,
+      name:
+        currentAssetData?.name ||
+        document.getElementById("portfolioAssetSymbol").value,
       symbol: document.getElementById("portfolioAssetSymbol").value,
       quantity: parseFloat(document.getElementById("portfolioQuantity").value),
-      purchasePrice: parseFloat(document.getElementById("portfolioPurchasePrice").value),
-      currentPrice: parseFloat(document.getElementById("portfolioCurrentPrice").value),
+      purchasePrice: parseFloat(
+        document.getElementById("portfolioPurchasePrice").value,
+      ),
+      currentPrice: parseFloat(
+        document.getElementById("portfolioCurrentPrice").value,
+      ),
       purchaseDate: document.getElementById("portfolioPurchaseDate").value,
-      currency: currentAssetData?.currency || "USD"
+      currency: currentAssetData?.currency || "USD",
     };
 
     await assetAPI.create(assetData);
     showToast(`${assetData.symbol} added to portfolio!`, "success");
 
     // Remove from wishlist if checkbox is checked
-    if (document.getElementById("removeFromWishlist").checked && wishlistItemId) {
+    if (
+      document.getElementById("removeFromWishlist").checked &&
+      wishlistItemId
+    ) {
       await wishlistAPI.delete(currentPortfolioId, parseInt(wishlistItemId));
       await loadWishlist();
     }
@@ -984,7 +1154,7 @@ function showLoading(show) {
 
 function debounce(func, wait) {
   let timeout;
-  return function(...args) {
+  return function (...args) {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
@@ -992,21 +1162,21 @@ function debounce(func, wait) {
 
 // ===== Test Function for Card Updates (Debug) =====
 function testCardUpdates() {
-  console.log("🧪 Testing card updates...");
-
   // Test with sample data
   updateCardValue("totalWatchlist", 5);
   updateCardValue("gainersCount", 3);
   updateCardValue("losersCount", 2);
   updateCardValue("alertsCount", 1);
 
-  console.log("✅ Test values set - check if cards show: Total=5, Gainers=3, Losers=2, Alerts=1");
-
   // Test element existence
-  const elements = ['totalWatchlist', 'gainersCount', 'losersCount', 'alertsCount'];
-  elements.forEach(id => {
+  const elements = [
+    "totalWatchlist",
+    "gainersCount",
+    "losersCount",
+    "alertsCount",
+  ];
+  elements.forEach((id) => {
     const el = document.getElementById(id);
-    console.log(`Element ${id}:`, el ? 'EXISTS' : 'NOT FOUND', el ? `(current value: "${el.textContent}")` : '');
   });
 }
 

@@ -21,6 +21,13 @@ async function initAnalyticsPage() {
   window.addEventListener("portfolioChanged", handlePortfolioChange);
   initCharts();
   setupEventListeners();
+
+  // Load initial portfolio from localStorage if available
+  const savedPortfolioId = localStorage.getItem("activePortfolioId");
+  if (savedPortfolioId) {
+    currentPortfolioId = savedPortfolioId;
+    await loadAnalyticsData(savedPortfolioId);
+  }
 }
 
 async function handlePortfolioChange(event) {
@@ -373,12 +380,35 @@ function showAddBenchmarkModal() {
 async function handleAddBenchmark(data) {
   const { symbol, name, indexType, description } = data;
 
+  // Get portfolio ID from current state or localStorage
+  const portfolioId =
+    currentPortfolioId || localStorage.getItem("activePortfolioId");
+
+  if (!portfolioId) {
+    showToast("Please select a portfolio first", "error");
+    return;
+  }
+
+  // Validate that all required fields are provided
+  if (!symbol || !name) {
+    showToast("Symbol and Name are required", "error");
+    return;
+  }
+
+  console.log("Adding benchmark:", {
+    portfolioId,
+    symbol,
+    name,
+    indexType,
+    description,
+  });
+
   try {
-    const response = await benchmarkAPI.add(currentPortfolioId, {
-      symbol,
-      name,
-      indexType,
-      description,
+    const response = await benchmarkAPI.add(portfolioId, {
+      symbol: symbol.trim(),
+      name: name.trim(),
+      indexType: indexType || "INDEX",
+      description: description || "",
     });
 
     if (response?.success) {
@@ -386,7 +416,7 @@ async function handleAddBenchmark(data) {
       hideBenchmarkForm();
 
       // Reload benchmarks
-      const benchmarksData = await benchmarkAPI.getAll(currentPortfolioId);
+      const benchmarksData = await benchmarkAPI.getAll(portfolioId);
       benchmarks = benchmarksData?.data || [];
       updateBenchmarkList();
       updatePerformanceChartWithBenchmarks();
@@ -402,14 +432,23 @@ async function removeBenchmark(benchmarkId) {
     return;
   }
 
+  // Get portfolio ID from current state or localStorage
+  const portfolioId =
+    currentPortfolioId || localStorage.getItem("activePortfolioId");
+
+  if (!portfolioId) {
+    showToast("Please select a portfolio first", "error");
+    return;
+  }
+
   try {
-    const response = await benchmarkAPI.delete(currentPortfolioId, benchmarkId);
+    const response = await benchmarkAPI.delete(portfolioId, benchmarkId);
 
     if (response?.success) {
       showToast("Benchmark removed successfully", "success");
 
       // Reload benchmarks
-      const benchmarksData = await benchmarkAPI.getAll(currentPortfolioId);
+      const benchmarksData = await benchmarkAPI.getAll(portfolioId);
       benchmarks = benchmarksData?.data || [];
       updateBenchmarkList();
       updatePerformanceChartWithBenchmarks();

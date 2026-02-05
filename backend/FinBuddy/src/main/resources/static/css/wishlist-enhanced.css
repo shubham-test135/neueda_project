@@ -36,7 +36,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===== Filter Bar ===== */
@@ -95,7 +97,11 @@
 /* ===== Add Asset Form ===== */
 .add-asset-form {
   border: 2px dashed var(--border-color, #e2e8f0);
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.02), rgba(6, 182, 212, 0.02));
+  background: linear-gradient(
+    135deg,
+    rgba(79, 70, 229, 0.02),
+    rgba(6, 182, 212, 0.02)
+  );
 }
 
 .add-asset-form .section-header {
@@ -254,10 +260,22 @@
   letter-spacing: 0.3px;
 }
 
-.result-type.stock { background: #dbeafe; color: #1d4ed8; }
-.result-type.bond { background: #ede9fe; color: #6d28d9; }
-.result-type.mutual-fund { background: #d1fae5; color: #059669; }
-.result-type.sip { background: #fef3c7; color: #d97706; }
+.result-type.stock {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.result-type.bond {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+.result-type.mutual-fund {
+  background: #d1fae5;
+  color: #059669;
+}
+.result-type.sip {
+  background: #fef3c7;
+  color: #d97706;
+}
 
 .result-extra {
   font-size: 12px;
@@ -354,7 +372,11 @@
   font-weight: 700;
   font-size: 14px;
   color: white;
-  background: linear-gradient(135deg, var(--primary, #4f46e5), var(--primary-light, #818cf8));
+  background: linear-gradient(
+    135deg,
+    var(--primary, #4f46e5),
+    var(--primary-light, #818cf8)
+  );
 }
 
 .asset-cell-info h4 {
@@ -379,10 +401,22 @@
   letter-spacing: 0.3px;
 }
 
-.type-badge.stock { background: #dbeafe; color: #1d4ed8; }
-.type-badge.bond { background: #ede9fe; color: #6d28d9; }
-.type-badge.mutual_fund { background: #d1fae5; color: #059669; }
-.type-badge.sip { background: #fef3c7; color: #d97706; }
+.type-badge.stock {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.type-badge.bond {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+.type-badge.mutual_fund {
+  background: #d1fae5;
+  color: #059669;
+}
+.type-badge.sip {
+  background: #fef3c7;
+  color: #d97706;
+}
 
 .price-cell {
   font-weight: 600;
@@ -480,7 +514,11 @@
   height: 80px;
   margin: 0 auto 20px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(6, 182, 212, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(79, 70, 229, 0.1),
+    rgba(6, 182, 212, 0.1)
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -521,8 +559,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-container {
@@ -543,8 +585,14 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .modal-header {
@@ -706,8 +754,12 @@
   color: var(--text-primary, #1e293b);
 }
 
-.stat-value.positive { color: var(--success, #10b981); }
-.stat-value.negative { color: var(--danger, #ef4444); }
+.stat-value.positive {
+  color: var(--success, #10b981);
+}
+.stat-value.negative {
+  color: var(--danger, #ef4444);
+}
 
 /* ===== Chart Controls ===== */
 .chart-controls {
@@ -888,6 +940,15 @@
   .asset-details-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  /* Chart responsiveness */
+  .chart-container {
+    min-height: 350px;
+  }
+
+  .chart-container canvas {
+    max-height: 350px !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -928,6 +989,30 @@
   .data-table tbody td {
     padding: 12px;
   }
+
+  /* Chart responsiveness */
+  .chart-container {
+    min-height: 300px;
+    padding: var(--spacing-md);
+  }
+
+  .chart-container canvas {
+    max-height: 300px !important;
+  }
+
+  .chart-controls {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .chart-controls select,
+  .chart-controls button {
+    width: 100%;
+  }
+
+  .chart-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 480px) {
@@ -939,6 +1024,45 @@
   .header-actions .btn {
     width: 100%;
     justify-content: center;
+  }
+
+  /* Chart mobile optimization */
+  .chart-container {
+    min-height: 250px;
+    padding: var(--spacing-sm);
+  }
+
+  .chart-container canvas {
+    max-height: 250px !important;
+  }
+
+  .chart-stats {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .chart-stat {
+    padding: var(--spacing-sm);
+  }
+
+  .chart-stat-value {
+    font-size: 1.125rem;
+  }
+
+  /* Table overflow scroll for mobile */
+  .data-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table {
+    font-size: 0.75rem;
+    min-width: 600px;
+  }
+
+  .data-table thead th,
+  .data-table tbody td {
+    padding: 8px;
   }
 }
 
@@ -966,18 +1090,31 @@
 }
 
 /* ===== Positive/Negative Text ===== */
-.positive { color: var(--success, #10b981) !important; }
-.negative { color: var(--danger, #ef4444) !important; }
+.positive {
+  color: var(--success, #10b981) !important;
+}
+.negative {
+  color: var(--danger, #ef4444) !important;
+}
 
 /* ===== Alert States ===== */
 .row-alert-triggered {
-  background: linear-gradient(90deg, rgba(239, 68, 68, 0.08), transparent) !important;
+  background: linear-gradient(
+    90deg,
+    rgba(239, 68, 68, 0.08),
+    transparent
+  ) !important;
   animation: alertGlow 2s ease-in-out infinite;
 }
 
 @keyframes alertGlow {
-  0%, 100% { background-color: rgba(239, 68, 68, 0.05); }
-  50% { background-color: rgba(239, 68, 68, 0.12); }
+  0%,
+  100% {
+    background-color: rgba(239, 68, 68, 0.05);
+  }
+  50% {
+    background-color: rgba(239, 68, 68, 0.12);
+  }
 }
 
 .target-cell.alert-triggered input {
@@ -1009,8 +1146,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .target-cell {
@@ -1025,7 +1167,8 @@
 }
 
 @keyframes alertPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
   }
@@ -1054,14 +1197,21 @@
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 /* ===== Summary Cards Hover ===== */
 .summary-cards .card {
   cursor: default;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .summary-cards .card:hover {

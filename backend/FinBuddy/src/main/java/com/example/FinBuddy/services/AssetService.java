@@ -234,6 +234,35 @@ public class AssetService {
     }
 
     /**
+     * Partially sell asset (reduce quantity)
+     */
+    public Asset sellAsset(Long id, Double quantityToSell) {
+        Asset asset = assetRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Asset not found"));
+
+        if (quantityToSell <= 0) {
+            throw new RuntimeException("Quantity to sell must be greater than 0");
+        }
+
+        if (quantityToSell > asset.getQuantity()) {
+            throw new RuntimeException("Cannot sell more than owned quantity");
+        }
+
+        // Reduce quantity - convert to Integer
+        Integer newQuantity = asset.getQuantity() - quantityToSell.intValue();
+        asset.setQuantity(newQuantity);
+        asset.setUpdatedAt(LocalDateTime.now());
+        asset.calculateMetrics();
+
+        Asset savedAsset = assetRepository.save(asset);
+
+        // Recalculate portfolio metrics
+        portfolioService.recalculatePortfolioMetrics(asset.getPortfolio().getId());
+
+        return savedAsset;
+    }
+
+    /**
      * Get assets by type
      */
     @Transactional(readOnly = true)

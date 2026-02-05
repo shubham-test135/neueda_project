@@ -28,8 +28,6 @@ function initializeLivePrices() {
   priceRefreshInterval = setInterval(() => {
     updateLivePrices();
   }, PRICE_REFRESH_INTERVAL);
-
-  console.log("Live price updates initialized");
 }
 
 /**
@@ -243,7 +241,6 @@ function toggleTheme() {
 }
 
 async function previewPdf() {
-  console.log("In the method")
   if (!currentPortfolioId) {
     showToast("Please select a portfolio", "error");
     return;
@@ -310,7 +307,3 @@ if (originalHandlePortfolioChange) {
     initializeLivePrices();
   };
 }
-
-console.log(
-  "Enhanced features loaded: Real-time prices, CSV export, Theme toggle",
-);

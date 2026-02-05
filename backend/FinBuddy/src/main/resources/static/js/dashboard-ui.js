@@ -106,8 +106,6 @@ function initializeDashboardUI() {
 }
 
 function handleNavigation(page) {
-  console.log("Navigating to:", page);
-
   // Hide all section cards except relevant ones based on page
   const wishlistSection = document.getElementById("wishlistSection");
 

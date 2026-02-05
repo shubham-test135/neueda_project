@@ -13,26 +13,17 @@ let growthChart = null;
 let performanceChart = null;
 
 // Initialize Dashboard
+// NOTE: Portfolio initialization is now handled by navbar.js
+// This prevents conflicts with the global portfolio selector
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM ready, API base:", API_BASE_URL);
-  // Safely attempt to load portfolios if element exists
-  const portfolioSelectEl = document.getElementById("portfolioSelect");
-  if (portfolioSelectEl) {
-    loadPortfolios().then((r) => console.log("Portfolios loaded", r));
-  } else {
-    console.warn("portfolioSelect element not found; skipping loadPortfolios");
-  }
   setupEventListeners();
   loadBenchmarks();
 });
 
 // ================== Event Listeners ==================
 function setupEventListeners() {
-  // Portfolio events
-  const portfolioSelect = document.getElementById("portfolioSelect");
-  if (portfolioSelect) {
-    portfolioSelect.addEventListener("change", handlePortfolioChange);
-  }
+  // Portfolio events - NOTE: Change event is now handled by navbar.js
+  // Keeping other portfolio-related button events here
 
   const createBtn = document.getElementById("createPortfolioBtn");
   if (createBtn) createBtn.addEventListener("click", openPortfolioModal);
@@ -42,10 +33,12 @@ function setupEventListeners() {
 
   // Asset events - guard elements
   const toggleAddAssetBtn = document.getElementById("toggleAddAssetBtn");
-  if (toggleAddAssetBtn) toggleAddAssetBtn.addEventListener("click", toggleAddAssetForm);
+  if (toggleAddAssetBtn)
+    toggleAddAssetBtn.addEventListener("click", toggleAddAssetForm);
 
   const cancelAssetBtn = document.getElementById("cancelAssetBtn");
-  if (cancelAssetBtn) cancelAssetBtn.addEventListener("click", toggleAddAssetForm);
+  if (cancelAssetBtn)
+    cancelAssetBtn.addEventListener("click", toggleAddAssetForm);
 
   const assetForm = document.getElementById("assetForm");
   if (assetForm) assetForm.addEventListener("submit", createAsset);
@@ -76,10 +69,8 @@ function setupEventListeners() {
 // ================== Portfolio Functions ==================
 async function loadPortfolios() {
   try {
-    console.log("Loading portfolios from API...");
     const response = await fetch(`/api/portfolios`);
     const portfolios = await response.json();
-    console.log(portfolios);
 
     const select = document.getElementById("portfolioSelect");
     if (!select) return portfolios;
@@ -93,11 +84,8 @@ async function loadPortfolios() {
       select.appendChild(option);
     });
 
-    // Auto-select first portfolio if available
-    if (portfolios.length > 0) {
-      select.value = portfolios[0].id;
-      await handlePortfolioChange();
-    }
+    // Portfolio selection is now managed by navbar.js
+    // No auto-selection here to prevent conflicts
 
     return portfolios;
   } catch (error) {
@@ -128,7 +116,6 @@ async function handlePortfolioChange() {
 
 async function createPortfolio(event) {
   if (event && event.preventDefault) event.preventDefault();
-  console.log("Trigerred")
   const nameEl = document.getElementById("portfolioName");
   const descEl = document.getElementById("portfolioDescription");
   const baseEl = document.getElementById("portfolioBaseCurrency");
