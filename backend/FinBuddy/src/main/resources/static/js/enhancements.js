@@ -242,47 +242,16 @@ function toggleTheme() {
   icon.className = isDark ? "fas fa-sun" : "fas fa-moon";
 }
 
-/**
- * Export to CSV
- */
-async function exportToCSV() {
+async function previewPdf() {
+  console.log("In the method")
   if (!currentPortfolioId) {
-    showToast("Please select a portfolio first", "error");
+    showToast("Please select a portfolio", "error");
     return;
   }
-
-  try {
-    const assets = await fetchAssets(currentPortfolioId);
-
-    if (assets.length === 0) {
-      showToast("No assets to export", "error");
-      return;
-    }
-
-    // Build CSV
-    let csv =
-      "Name,Symbol,Type,Quantity,Purchase Price,Current Price,Invested Amount,Current Value,Gain/Loss,G/L %\n";
-
-    assets.forEach((asset) => {
-      csv += `"${asset.name}","${asset.symbol}","${asset.assetType}",${asset.quantity},${asset.purchasePrice},${asset.currentPrice},${asset.investedAmount},${asset.currentValue},${asset.gainLoss},${asset.gainLossPercentage}\n`;
-    });
-
-    // Download
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `portfolio-${currentPortfolioId}-${Date.now()}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-
-    showToast("CSV exported successfully!", "success");
-  } catch (error) {
-    console.error("Error exporting CSV:", error);
-    showToast("Failed to export CSV", "error");
-  }
+  const iframe = document.getElementById("pdfPreviewFrame");
+  const container = document.getElementById("pdfPreviewContainer");
+  // iframe.src = `/api/reports/portfolio/${currentPortfolioId}/pdf`;
+  container.style.display = "block";
 }
 
 /**

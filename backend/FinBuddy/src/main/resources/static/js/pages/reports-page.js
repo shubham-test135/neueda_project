@@ -12,7 +12,8 @@ async function initReportsPage() {
 
 function setupEventListeners() {
   const downloadPdfBtn = document.getElementById("downloadPdfBtn");
-  const sendEmailBtn = document.getElementById("emailReportBtn"); // Focused on the email button
+  const sendEmailBtn = document.getElementById("emailReportBtn");
+  const previewPdfBtn = document.getElementById("previewPdfBtn");
 
   if (downloadPdfBtn) {
     downloadPdfBtn.addEventListener("click", handleDownloadPDF);
@@ -21,10 +22,36 @@ function setupEventListeners() {
   if (sendEmailBtn) {  // Listen for clicks on the Email Report button
     sendEmailBtn.addEventListener("click", handleSendEmail);
   }
+
+  if (previewPdfBtn) {
+    previewPdfBtn.addEventListener("click", handlePreviewPDF); // ✅ ADD
+  }
+
 }
 
 function handlePortfolioChange(event) {
   currentPortfolioId = event.detail.portfolioId;
+}
+
+function handlePreviewPDF() {
+  if (!currentPortfolioId) {
+    showToast("Please select a portfolio first", "warning");
+    return;
+  }
+
+  const container = document.getElementById("pdfPreviewContainer");
+  const iframe = document.getElementById("pdfPreviewFrame");
+
+  if (!container || !iframe) {
+    console.error("PDF preview elements not found");
+    return;
+  }
+
+  iframe.src = `/api/reports/portfolio/${currentPortfolioId}/pdf?mode=preview`;
+  container.style.display = "block";
+
+  // Optional UX polish
+  container.scrollIntoView({ behavior: "smooth" });
 }
 
 async function handleDownloadPDF() {
