@@ -128,7 +128,7 @@ async function handlePortfolioChange() {
 
 async function createPortfolio(event) {
   if (event && event.preventDefault) event.preventDefault();
-
+  console.log("Trigerred")
   const nameEl = document.getElementById("portfolioName");
   const descEl = document.getElementById("portfolioDescription");
   const baseEl = document.getElementById("portfolioBaseCurrency");

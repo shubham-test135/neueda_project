@@ -7,6 +7,8 @@ import { loadComponents } from "./utils/component-loader.js";
 import { initNavigation } from "./utils/navigation.js";
 import { initTheme } from "./utils/theme.js";
 import { initUI } from "./utils/ui.js";
+import { initAiChat } from "./ai-chat.js";
+
 
 // Initialize app when DOM is ready
 document.addEventListener("DOMContentLoaded", async () => {
@@ -18,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initNavigation();
     initTheme();
     initUI();
+    initAiChat();
 
     console.log("✅ FinBuddy initialized successfully");
   } catch (error) {

@@ -29,6 +29,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+/venv
+
 ### VS Code ###
 .vscode/
 
