@@ -182,16 +182,24 @@ async function loadWishlist() {
 
 // ===== Update Summary =====
 async function updateSummary() {
+  console.log("Updating summary for portfolio:", currentPortfolioId);
+  console.log("Current wishlist items:", wishlistItems.length);
+
   try {
     const response = await wishlistAPI.getSummary(currentPortfolioId);
-    if (response?.success) {
-      const s = response.data;
+    console.log("Summary API response:", response);
 
-      // Update card values
-      document.getElementById("totalWatchlist").textContent = s.totalWatchlist || 0;
-      document.getElementById("gainersCount").textContent = s.gainersCount || 0;
-      document.getElementById("losersCount").textContent = s.losersCount || 0;
-      document.getElementById("alertsCount").textContent = s.alertsCount || 0;
+    if (response?.success && response.data) {
+      const s = response.data;
+      console.log("API Summary data:", s);
+
+      // Update card values with element checks
+      updateCardValue("totalWatchlist", s.totalWatchlist || 0);
+      updateCardValue("gainersCount", s.gainersCount || 0);
+      updateCardValue("losersCount", s.losersCount || 0);
+      updateCardValue("alertsCount", s.alertsCount || 0);
+
+      console.log("Cards updated from API");
 
       // Show alert icon animation if there are triggered alerts
       const triggeredCount = wishlistItems.filter(i => i.alertTriggered).length;
@@ -205,17 +213,54 @@ async function updateSummary() {
           alertsCard.title = 'Active price alerts';
         }
       }
+    } else {
+      console.warn("API failed or no data, using fallback calculation");
+      updateSummaryFallback();
     }
   } catch (error) {
-    // Fallback to local calculation
-    document.getElementById("totalWatchlist").textContent = wishlistItems.length;
-    document.getElementById("gainersCount").textContent = wishlistItems.filter(i => (i.changePercentage || 0) > 0).length;
-    document.getElementById("losersCount").textContent = wishlistItems.filter(i => (i.changePercentage || 0) < 0).length;
-    document.getElementById("alertsCount").textContent = wishlistItems.filter(i => i.alertEnabled).length;
+    console.error("Error updating summary:", error);
+    updateSummaryFallback();
   }
 
   // Update last refresh time display
   updateLastRefreshTime();
+}
+
+// Helper function to update card values
+function updateCardValue(elementId, value) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.textContent = value;
+    console.log(`Updated ${elementId} to:`, value);
+  } else {
+    console.error(`Element not found: ${elementId}`);
+  }
+}
+
+// Fallback summary calculation
+function updateSummaryFallback() {
+  console.log("Using fallback calculation");
+
+  const totalWatchlist = wishlistItems.length;
+  const gainers = wishlistItems.filter(i => {
+    const change = i.changePercentage || 0;
+    console.log(`${i.symbol}: changePercentage = ${change}`);
+    return change > 0;
+  }).length;
+  const losers = wishlistItems.filter(i => (i.changePercentage || 0) < 0).length;
+  const alerts = wishlistItems.filter(i => i.alertEnabled).length;
+
+  console.log("Fallback calculations:", {
+    totalWatchlist,
+    gainers,
+    losers,
+    alerts
+  });
+
+  updateCardValue("totalWatchlist", totalWatchlist);
+  updateCardValue("gainersCount", gainers);
+  updateCardValue("losersCount", losers);
+  updateCardValue("alertsCount", alerts);
 }
 
 // Update last refresh time in header
@@ -944,6 +989,29 @@ function debounce(func, wait) {
     timeout = setTimeout(() => func(...args), wait);
   };
 }
+
+// ===== Test Function for Card Updates (Debug) =====
+function testCardUpdates() {
+  console.log("🧪 Testing card updates...");
+
+  // Test with sample data
+  updateCardValue("totalWatchlist", 5);
+  updateCardValue("gainersCount", 3);
+  updateCardValue("losersCount", 2);
+  updateCardValue("alertsCount", 1);
+
+  console.log("✅ Test values set - check if cards show: Total=5, Gainers=3, Losers=2, Alerts=1");
+
+  // Test element existence
+  const elements = ['totalWatchlist', 'gainersCount', 'losersCount', 'alertsCount'];
+  elements.forEach(id => {
+    const el = document.getElementById(id);
+    console.log(`Element ${id}:`, el ? 'EXISTS' : 'NOT FOUND', el ? `(current value: "${el.textContent}")` : '');
+  });
+}
+
+// Make test function globally accessible for console testing
+window.testCardUpdates = testCardUpdates;
 
 // ===== Global Exports =====
 window.viewDetails = viewDetails;
