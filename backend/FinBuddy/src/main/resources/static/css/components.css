@@ -493,57 +493,145 @@
   }
 }
 
+/* Overlay */
 #aiChatModal {
-  display: none;              /* hidden by default */
-  position: fixed;
-  inset: 0;                   /* full screen */
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-
-  /* CENTER THE MODAL */
   display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55); /* slate-900 */
+  backdrop-filter: blur(6px);
+  z-index: 1000;
   align-items: center;
   justify-content: center;
 }
 
+#aiChatModal.active {
+  display: flex;
+}
+
+/* Modal card */
 .ai-chat-modal {
   width: 420px;
   max-height: 80vh;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  animation: scaleIn 0.2s ease-out;
 }
 
+/* Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: white;
+}
+
+.modal-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.modal-header .close {
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+.modal-header .close:hover {
+  opacity: 1;
+}
+
+/* Messages area */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 12px;
-  background: #f9fafb;
+  padding: 14px;
+  background: #f8fafc;
 }
 
+/* Message bubbles */
 .chat-message {
-  margin-bottom: 8px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  max-width: 85%;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  max-width: 80%;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
 }
 
+/* User message */
 .chat-message.user {
   background: #2563eb;
   color: white;
   margin-left: auto;
+  border-bottom-right-radius: 4px;
 }
 
+/* Bot message */
 .chat-message.bot {
   background: #e5e7eb;
   color: #111827;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
 }
 
+/* Input area */
 .chat-input {
   display: flex;
   gap: 8px;
-  padding: 10px;
+  padding: 12px;
   border-top: 1px solid #e5e7eb;
+  background: white;
 }
+
+.chat-input input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  outline: none;
+}
+
+.chat-input input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.chat-input button {
+  padding: 0 16px;
+  border-radius: 8px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background: #1e40af;
+}
+
+/* Subtle open animation */
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 
 
 

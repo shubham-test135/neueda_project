@@ -11,6 +11,13 @@ export function initAiChat() {
         return;
     }
 
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+
+
     openBtn.addEventListener("click", () => {
         modal.style.display = "flex";
         input?.focus();
