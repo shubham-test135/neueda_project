@@ -452,6 +452,215 @@ body {
   color: var(--text-primary);
 }
 
+/* ============================================
+   Form Validation Styles
+   ============================================ */
+
+/* Input Validation States */
+.form-input:valid,
+.form-select:valid {
+  border-color: var(--success-color);
+}
+
+.form-input:invalid:not(:placeholder-shown),
+.form-select:invalid:not(:placeholder-shown) {
+  border-color: var(--danger-color);
+}
+
+.form-input:focus:valid,
+.form-select:focus:valid {
+  border-color: var(--success-color);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.form-input:focus:invalid,
+.form-select:focus:invalid {
+  border-color: var(--danger-color);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Required Field Indicator */
+.form-group label::after {
+  content: "";
+  margin-left: 4px;
+}
+
+.form-group:has([required]) label::after {
+  content: "*";
+  color: var(--danger-color);
+  margin-left: 4px;
+}
+
+/* Validation Icons */
+.form-group {
+  position: relative;
+}
+
+.form-input:valid:not(:placeholder-shown):not([readonly]),
+.form-select:valid:not(:placeholder-shown) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2310b981'%3E%3Cpath fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.25rem;
+  padding-right: 2.5rem;
+}
+
+.form-input:invalid:not(:placeholder-shown):not([readonly]),
+.form-select:invalid:not(:placeholder-shown) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23ef4444'%3E%3Cpath fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.25rem;
+  padding-right: 2.5rem;
+}
+
+/* Custom Validation Messages */
+.form-group .validation-message {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+.form-group .validation-message.error {
+  color: var(--danger-color);
+  display: block;
+}
+
+.form-group .validation-message.success {
+  color: var(--success-color);
+  display: block;
+}
+
+/* Form Submit Button States */
+form:invalid .btn-primary[type="submit"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Input Focus States */
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Number Input Validation */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+/* Date Input Validation */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/* Disabled Input States */
+.form-input:disabled,
+.form-select:disabled {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Readonly Input States */
+.form-input[readonly] {
+  background-color: #f8fafc;
+  cursor: default;
+  border-color: var(--border-color);
+}
+
+/* Pattern Mismatch Styling */
+.form-input:invalid:not(:focus):not(:placeholder-shown)[pattern] {
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* Checkbox Validation */
+input[type="checkbox"]:required:invalid {
+  outline: 2px solid var(--danger-color);
+  outline-offset: 2px;
+}
+
+input[type="checkbox"]:required:valid {
+  outline: 2px solid var(--success-color);
+  outline-offset: 2px;
+}
+
+/* Select Validation */
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2364748b'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.25rem;
+  padding-right: 2.5rem;
+}
+
+/* Form Error Summary */
+.form-errors {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+.form-errors.show {
+  display: block;
+}
+
+.form-errors h4 {
+  color: var(--danger-color);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-errors ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.form-errors li {
+  color: var(--danger-color);
+  font-size: 0.75rem;
+  padding: 0.25rem 0;
+}
+
+.form-errors li::before {
+  content: "• ";
+  margin-right: 0.5rem;
+}
+
+/* Success Message */
+.form-success {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  color: var(--success-color);
+  display: none;
+}
+
+.form-success.show {
+  display: block;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .summary-cards {

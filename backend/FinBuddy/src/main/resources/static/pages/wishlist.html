@@ -46,14 +46,21 @@
               </h1>
               <p class="page-subtitle">
                 Track and monitor assets before adding to your portfolio
-                <span class="auto-refresh-badge" title="Prices refresh automatically every 60 seconds">
+                <span
+                  class="auto-refresh-badge"
+                  title="Prices refresh automatically every 60 seconds"
+                >
                   <span class="dot"></span>
                   Auto-refreshing
                 </span>
               </p>
             </div>
             <div class="header-actions">
-              <button class="btn btn-secondary" id="refreshPricesBtn" title="Click to refresh prices manually">
+              <button
+                class="btn btn-secondary"
+                id="refreshPricesBtn"
+                title="Click to refresh prices manually"
+              >
                 <i class="fas fa-sync-alt"></i>
                 <span>Refresh</span>
               </button>
@@ -66,7 +73,10 @@
 
           <!-- Summary Cards -->
           <div class="summary-cards">
-            <div class="card card-animated" title="Total number of assets you're tracking in your wishlist">
+            <div
+              class="card card-animated"
+              title="Total number of assets you're tracking in your wishlist"
+            >
               <div class="card-header">
                 <div class="card-icon gradient-blue">
                   <i class="fas fa-list"></i>
@@ -79,7 +89,10 @@
               </div>
             </div>
 
-            <div class="card card-animated" title="Assets with positive price change today">
+            <div
+              class="card card-animated"
+              title="Assets with positive price change today"
+            >
               <div class="card-header">
                 <div class="card-icon gradient-green">
                   <i class="fas fa-arrow-up"></i>
@@ -92,7 +105,10 @@
               </div>
             </div>
 
-            <div class="card card-animated" title="Assets with negative price change today">
+            <div
+              class="card card-animated"
+              title="Assets with negative price change today"
+            >
               <div class="card-header">
                 <div class="card-icon gradient-red">
                   <i class="fas fa-arrow-down"></i>
@@ -105,7 +121,10 @@
               </div>
             </div>
 
-            <div class="card card-animated" title="Set a target price to get notified when asset reaches that price">
+            <div
+              class="card card-animated"
+              title="Set a target price to get notified when asset reaches that price"
+            >
               <div class="card-header">
                 <div class="card-icon gradient-orange">
                   <i class="fas fa-bell"></i>
@@ -120,13 +139,21 @@
           </div>
 
           <!-- Add Asset Form -->
-          <div class="section-card add-asset-form" id="addWishlistForm" style="display: none">
+          <div
+            class="section-card add-asset-form"
+            id="addWishlistForm"
+            style="display: none"
+          >
             <div class="section-header">
               <div class="section-title">
                 <i class="fas fa-plus-circle"></i>
                 <h2>Add to Wishlist</h2>
               </div>
-              <button class="btn-icon" id="cancelWishlistBtn" aria-label="Close form">
+              <button
+                class="btn-icon"
+                id="cancelWishlistBtn"
+                aria-label="Close form"
+              >
                 <i class="fas fa-times"></i>
               </button>
             </div>
@@ -157,8 +184,16 @@
                       placeholder="Type to search..."
                       autocomplete="off"
                       required
+                      minlength="1"
+                      maxlength="100"
+                      pattern="[A-Za-z0-9\s\-\.]+"
+                      title="Please enter a valid asset name (letters, numbers, spaces, hyphens, and periods only)"
                     />
-                    <div class="asset-search-results" id="wishlistSearchResults" style="display: none"></div>
+                    <div
+                      class="asset-search-results"
+                      id="wishlistSearchResults"
+                      style="display: none"
+                    ></div>
                   </div>
                 </div>
                 <div class="form-group">
@@ -184,11 +219,18 @@
                     id="wishlistTargetPrice"
                     class="form-input"
                     placeholder="Optional"
+                    min="0.01"
+                    max="999999999.99"
+                    title="Please enter a valid price (minimum 0.01)"
                   />
                 </div>
               </div>
               <div class="form-actions">
-                <button type="button" class="btn btn-secondary" id="cancelWishlistBtn2">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  id="cancelWishlistBtn2"
+                >
                   Cancel
                 </button>
                 <button type="submit" class="btn btn-primary">
@@ -211,7 +253,11 @@
                 />
               </div>
               <div class="filter-group">
-                <select id="categoryFilter" class="form-select" aria-label="Filter by category">
+                <select
+                  id="categoryFilter"
+                  class="form-select"
+                  aria-label="Filter by category"
+                >
                   <option value="all">All Types</option>
                   <option value="stock">Stocks</option>
                   <option value="bond">Bonds</option>
@@ -390,7 +436,12 @@
           <form id="addToPortfolioForm">
             <div class="form-group">
               <label>Asset</label>
-              <input type="text" id="portfolioAssetName" class="form-input" readonly />
+              <input
+                type="text"
+                id="portfolioAssetName"
+                class="form-input"
+                readonly
+              />
               <input type="hidden" id="portfolioAssetSymbol" />
               <input type="hidden" id="portfolioAssetType" />
               <input type="hidden" id="portfolioWishlistItemId" />
@@ -405,9 +456,11 @@
                   id="portfolioQuantity"
                   class="form-input"
                   min="0.001"
+                  max="999999999"
                   step="0.001"
                   placeholder="Enter quantity"
                   required
+                  title="Please enter a valid quantity (minimum 0.001)"
                 />
               </div>
               <div class="form-group">
@@ -419,9 +472,11 @@
                   id="portfolioPurchasePrice"
                   class="form-input"
                   min="0.01"
+                  max="999999999.99"
                   step="0.01"
                   placeholder="Price per unit"
                   required
+                  title="Please enter a valid purchase price (minimum 0.01)"
                 />
               </div>
             </div>
@@ -435,9 +490,11 @@
                   id="portfolioCurrentPrice"
                   class="form-input"
                   min="0.01"
+                  max="999999999.99"
                   step="0.01"
                   placeholder="Current price"
                   required
+                  title="Please enter a valid current price (minimum 0.01)"
                 />
               </div>
               <div class="form-group">
@@ -449,6 +506,8 @@
                   id="portfolioPurchaseDate"
                   class="form-input"
                   required
+                  max="2099-12-31"
+                  title="Please select a valid purchase date"
                 />
               </div>
             </div>
@@ -461,10 +520,18 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="cancelPortfolioAdd">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="cancelPortfolioAdd"
+          >
             Cancel
           </button>
-          <button type="submit" form="addToPortfolioForm" class="btn btn-primary">
+          <button
+            type="submit"
+            form="addToPortfolioForm"
+            class="btn btn-primary"
+          >
             <i class="fas fa-check"></i> Add to Portfolio
           </button>
         </div>
