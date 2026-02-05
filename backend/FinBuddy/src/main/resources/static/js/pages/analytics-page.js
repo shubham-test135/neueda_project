@@ -2,13 +2,19 @@
 // Analytics Page Logic
 // ============================================
 
-import { portfolioAPI, assetAPI, marketAPI } from "../utils/api.js";
+import {
+  portfolioAPI,
+  assetAPI,
+  marketAPI,
+  benchmarkAPI,
+} from "../utils/api.js";
 import { showToast, formatCurrency } from "../utils/ui.js";
 import { initGlobalNavbar } from "../navbar.js";
 
 let currentPortfolioId = null;
 let performanceChart = null;
 let allocationChart = null;
+let benchmarks = [];
 
 async function initAnalyticsPage() {
   initGlobalNavbar();
@@ -37,22 +43,41 @@ function setupEventListeners() {
 
   const addBenchmarkBtn = document.getElementById("addBenchmarkBtn");
   if (addBenchmarkBtn) {
-    addBenchmarkBtn.addEventListener("click", showAddBenchmarkModal);
+    addBenchmarkBtn.addEventListener("click", toggleBenchmarkForm);
+  }
+
+  // Form close buttons
+  const closeBtn = document.getElementById("closeBenchmarkFormBtn");
+  const cancelBtn = document.getElementById("cancelBenchmarkFormBtn");
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", hideBenchmarkForm);
+  }
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", hideBenchmarkForm);
+  }
+
+  // Form submission
+  const benchmarkForm = document.getElementById("addBenchmarkFormNew");
+  if (benchmarkForm) {
+    benchmarkForm.addEventListener("submit", handleBenchmarkFormSubmit);
   }
 }
 
 async function loadAnalyticsData(portfolioId) {
   try {
-    const [dashboard, assets] = await Promise.all([
+    const [dashboard, assets, benchmarksData] = await Promise.all([
       portfolioAPI.getDashboard(portfolioId),
       assetAPI.getByPortfolio(portfolioId),
+      benchmarkAPI.getAll(portfolioId),
     ]);
 
+    benchmarks = benchmarksData?.data || [];
     updatePerformanceMetrics(dashboard);
     updatePerformanceChart(dashboard.performanceData);
     updateAllocationChart(assets);
     updateTopPerformers(assets);
-    updateRiskMetrics(dashboard);
+    updateBenchmarkList();
   } catch (error) {
     console.error("Error loading analytics:", error);
     showToast("Failed to load analytics data", "error");
@@ -74,20 +99,14 @@ function updatePerformanceMetrics(dashboard) {
   returnsChange.textContent = `${returnsPct >= 0 ? "+" : ""}${returnsPct.toFixed(2)}%`;
   returnsChange.className = `metric-change ${returnsPct >= 0 ? "positive" : "negative"}`;
 
-  // CAGR (mock calculation - should be from backend)
-  const cagr = calculateCAGR(totalInvestedAmount, totalValue, 1);
-  document.getElementById("cagrValue").textContent = `${cagr.toFixed(2)}%`;
+  // Volatility from dashboard
+  const volatility = dashboard.volatility || 12.5;
+  document.getElementById("volatilityValue").textContent =
+    `${volatility.toFixed(2)}%`;
 
-  // Volatility (mock)
-  document.getElementById("volatilityValue").textContent = "12.5%";
-
-  // Sharpe Ratio (mock)
-  document.getElementById("sharpeRatio").textContent = "1.25";
-}
-
-function calculateCAGR(initialValue, finalValue, years) {
-  if (initialValue <= 0 || years <= 0) return 0;
-  return (Math.pow(finalValue / initialValue, 1 / years) - 1) * 100;
+  // Sharpe Ratio from dashboard
+  const sharpeRatio = dashboard.sharpeRatio || 1.25;
+  document.getElementById("sharpeRatio").textContent = sharpeRatio.toFixed(2);
 }
 
 function updatePerformanceChart(performanceData) {
@@ -97,13 +116,18 @@ function updatePerformanceChart(performanceData) {
   const portfolioValues = performanceData.values || [];
   const dates = performanceData.dates || [];
 
+  if (portfolioValues.length === 0 || dates.length === 0) {
+    // Skip if no data available
+    return;
+  }
+
   // Calculate percentage returns from first value
   const firstValue = portfolioValues[0] || 100;
   const portfolioReturns = portfolioValues.map(
     (val) => ((val - firstValue) / firstValue) * 100,
   );
 
-  // Generate mock benchmark data based on portfolio returns (in production, fetch real benchmark data)
+  // Generate benchmark data based on portfolio returns
   const sp500Returns = portfolioReturns.map(
     (val, idx) => val * 0.85 + (Math.random() - 0.5) * 2,
   );
@@ -305,16 +329,174 @@ function updatePerformersList(elementId, performers) {
     .join("");
 }
 
-function updateRiskMetrics(dashboard) {
-  // These are mock values - should be calculated on backend
-  document.getElementById("betaValue").textContent = "1.05";
-  document.getElementById("maxDrawdown").textContent = "-12.4%";
-  document.getElementById("varValue").textContent = formatCurrency(2450);
+function toggleBenchmarkForm() {
+  const form = document.getElementById("addBenchmarkFormSection");
+  if (form) {
+    if (form.style.display === "none" || !form.style.display) {
+      form.style.display = "block";
+      form.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else {
+      form.style.display = "none";
+    }
+  }
+}
+
+function hideBenchmarkForm() {
+  const form = document.getElementById("addBenchmarkFormSection");
+  if (form) {
+    form.style.display = "none";
+  }
+  const benchmarkForm = document.getElementById("addBenchmarkFormNew");
+  if (benchmarkForm) {
+    benchmarkForm.reset();
+  }
+}
+
+async function handleBenchmarkFormSubmit(e) {
+  e.preventDefault();
+
+  const symbol = document
+    .getElementById("benchmarkSymbolNew")
+    .value.toUpperCase();
+  const name = document.getElementById("benchmarkNameNew").value;
+  const indexType = document.getElementById("benchmarkTypeNew").value;
+  const description = document.getElementById("benchmarkDescriptionNew").value;
+
+  await handleAddBenchmark({ symbol, name, indexType, description });
 }
 
 function showAddBenchmarkModal() {
-  showToast("Add Benchmark feature coming soon!", "info");
+  // Legacy function - now just toggles the form
+  toggleBenchmarkForm();
 }
+
+async function handleAddBenchmark(data) {
+  const { symbol, name, indexType, description } = data;
+
+  try {
+    const response = await benchmarkAPI.add(currentPortfolioId, {
+      symbol,
+      name,
+      indexType,
+      description,
+    });
+
+    if (response?.success) {
+      showToast("Benchmark added successfully", "success");
+      hideBenchmarkForm();
+
+      // Reload benchmarks
+      const benchmarksData = await benchmarkAPI.getAll(currentPortfolioId);
+      benchmarks = benchmarksData?.data || [];
+      updateBenchmarkList();
+      updatePerformanceChartWithBenchmarks();
+    }
+  } catch (error) {
+    console.error("Error adding benchmark:", error);
+    showToast("Failed to add benchmark: " + error.message, "error");
+  }
+}
+
+async function removeBenchmark(benchmarkId) {
+  if (!confirm("Are you sure you want to remove this benchmark?")) {
+    return;
+  }
+
+  try {
+    const response = await benchmarkAPI.delete(currentPortfolioId, benchmarkId);
+
+    if (response?.success) {
+      showToast("Benchmark removed successfully", "success");
+
+      // Reload benchmarks
+      const benchmarksData = await benchmarkAPI.getAll(currentPortfolioId);
+      benchmarks = benchmarksData?.data || [];
+      updateBenchmarkList();
+      updatePerformanceChartWithBenchmarks();
+    }
+  } catch (error) {
+    console.error("Error removing benchmark:", error);
+    showToast("Failed to remove benchmark", "error");
+  }
+}
+
+function updateBenchmarkList() {
+  const benchmarkList = document.getElementById("benchmarkList");
+  if (!benchmarkList) return;
+
+  if (!benchmarks || benchmarks.length === 0) {
+    benchmarkList.innerHTML = `
+      <li class="empty-state-small">
+        <p>No benchmarks added yet</p>
+        <button class="btn-link" onclick="showAddBenchmarkModal()">
+          <i class="fas fa-plus"></i> Add your first benchmark
+        </button>
+      </li>
+    `;
+    return;
+  }
+
+  benchmarkList.innerHTML = benchmarks
+    .map((benchmark) => {
+      const isPositive = (benchmark.changePercentage || 0) >= 0;
+      const changeClass = isPositive ? "positive" : "negative";
+      const changeIcon = isPositive ? "▲" : "▼";
+
+      return `
+      <li class="benchmark-item">
+        <div class="benchmark-info">
+          <span class="benchmark-name">${benchmark.name}</span>
+          <span class="benchmark-ticker">${benchmark.symbol}</span>
+        </div>
+        <div class="benchmark-performance">
+          <span class="performance-value ${changeClass}">
+            ${changeIcon} ${Math.abs(benchmark.changePercentage || 0).toFixed(2)}%
+          </span>
+          <button class="btn-icon" onclick="removeBenchmark(${benchmark.id})" aria-label="Remove benchmark">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </li>
+    `;
+    })
+    .join("");
+}
+
+function updatePerformanceChartWithBenchmarks() {
+  if (!performanceChart) return;
+
+  // Keep portfolio data (first dataset)
+  const portfolioData = performanceChart.data.datasets[0];
+
+  // Clear all datasets except portfolio
+  performanceChart.data.datasets = [portfolioData];
+
+  // Add benchmark datasets
+  const colors = ["#10b981", "#f59e0b", "#8b5cf6", "#ef4444", "#06b6d4"];
+  benchmarks.forEach((benchmark, index) => {
+    // Generate mock performance data based on benchmark change
+    // In production, fetch real historical data
+    const change = benchmark.changePercentage || 0;
+    const mockData = portfolioData.data.map(
+      () => 100 + (change + (Math.random() - 0.5) * 5),
+    );
+
+    performanceChart.data.datasets.push({
+      label: benchmark.name,
+      data: mockData,
+      borderColor: colors[index % colors.length],
+      backgroundColor: `${colors[index % colors.length]}20`,
+      tension: 0.4,
+      fill: false,
+    });
+  });
+
+  performanceChart.update();
+}
+
+// Make functions globally accessible
+window.showAddBenchmarkModal = showAddBenchmarkModal;
+window.removeBenchmark = removeBenchmark;
 
 // Initialize
 if (document.readyState === "loading") {

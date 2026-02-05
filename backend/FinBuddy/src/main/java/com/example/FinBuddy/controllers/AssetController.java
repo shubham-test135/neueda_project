@@ -19,7 +19,7 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class AssetController {
 
-    private final AssetService  assetService;
+    private final AssetService assetService;
 
     /**
      * Get all assets
@@ -69,11 +69,48 @@ public class AssetController {
 
     /**
      * Search assets by name or symbol
+     * Searches across all asset types: Stocks, Bonds, Mutual Funds, and SIPs
      */
     @GetMapping("/search")
     public ResponseEntity<List<Asset>> searchAssets(@RequestParam String query) {
         List<Asset> assets = assetService.searchAssets(query);
         return ResponseEntity.ok(assets);
+    }
+
+    /**
+     * Search stocks only
+     */
+    @GetMapping("/search/stocks")
+    public ResponseEntity<List<Asset>> searchStocks(@RequestParam String query) {
+        List<Asset> stocks = assetService.searchStocks(query);
+        return ResponseEntity.ok(stocks);
+    }
+
+    /**
+     * Search bonds only
+     */
+    @GetMapping("/search/bonds")
+    public ResponseEntity<List<Asset>> searchBonds(@RequestParam String query) {
+        List<Asset> bonds = assetService.searchBonds(query);
+        return ResponseEntity.ok(bonds);
+    }
+
+    /**
+     * Search mutual funds only
+     */
+    @GetMapping("/search/mutualfunds")
+    public ResponseEntity<List<Asset>> searchMutualFunds(@RequestParam String query) {
+        List<Asset> mutualFunds = assetService.searchMutualFunds(query);
+        return ResponseEntity.ok(mutualFunds);
+    }
+
+    /**
+     * Search SIPs only
+     */
+    @GetMapping("/search/sips")
+    public ResponseEntity<List<Asset>> searchSIPs(@RequestParam String query) {
+        List<Asset> sips = assetService.searchSIPs(query);
+        return ResponseEntity.ok(sips);
     }
 
     /**

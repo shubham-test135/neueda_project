@@ -24,7 +24,7 @@ async function apiCall(endpoint, options = {}) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    if(response.status===204) {
+    if (response.status === 204) {
       return null;
     }
 
@@ -54,6 +54,7 @@ export const portfolioAPI = {
       method: "DELETE",
     }),
   getDashboard: (id) => apiCall(`/portfolios/${id}/dashboard`),
+  getRiskAnalysis: (id) => apiCall(`/portfolios/${id}/risk-analysis`),
   recalculate: (id) =>
     apiCall(`/portfolios/${id}/recalculate`, {
       method: "POST",
@@ -128,11 +129,57 @@ export const reportAPI = {
 
   // Send email with the PDF attached
   sendEmail: async (portfolioId, email) => {
-    const response = await fetch(`${API_BASE_URL}/reports/email?portfolioId=${portfolioId}&email=${email}`, {
-      method: 'POST',
-    });
-    return await response.json();  // { success: true/false }
-  }
+    const response = await fetch(
+      `${API_BASE_URL}/reports/email?portfolioId=${portfolioId}&email=${email}`,
+      {
+        method: "POST",
+      },
+    );
+    return await response.json(); // { success: true/false }
+  },
+};
+
+// Wishlist APIs
+export const wishlistAPI = {
+  getAll: (portfolioId) => apiCall(`/portfolios/${portfolioId}/wishlist`),
+  getSummary: (portfolioId) =>
+    apiCall(`/portfolios/${portfolioId}/wishlist/summary`),
+  add: (portfolioId, data) =>
+    apiCall(`/portfolios/${portfolioId}/wishlist`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  update: (portfolioId, itemId, data) =>
+    apiCall(`/portfolios/${portfolioId}/wishlist/${itemId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  delete: (portfolioId, itemId) =>
+    apiCall(`/portfolios/${portfolioId}/wishlist/${itemId}`, {
+      method: "DELETE",
+    }),
+  refreshPrices: (portfolioId) =>
+    apiCall(`/portfolios/${portfolioId}/wishlist/refresh`, {
+      method: "POST",
+    }),
+};
+
+// Benchmark APIs
+export const benchmarkAPI = {
+  getAll: (portfolioId) => apiCall(`/portfolios/${portfolioId}/benchmarks`),
+  add: (portfolioId, data) =>
+    apiCall(`/portfolios/${portfolioId}/benchmarks`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  delete: (portfolioId, benchmarkId) =>
+    apiCall(`/portfolios/${portfolioId}/benchmarks/${benchmarkId}`, {
+      method: "DELETE",
+    }),
+  refresh: (portfolioId) =>
+    apiCall(`/portfolios/${portfolioId}/benchmarks/refresh`, {
+      method: "POST",
+    }),
 };
 
 export default {
@@ -140,4 +187,6 @@ export default {
   assetAPI,
   marketAPI,
   reportAPI,
+  wishlistAPI,
+  benchmarkAPI,
 };

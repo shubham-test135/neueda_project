@@ -5,6 +5,10 @@ import com.example.FinBuddy.dto.WishlistItemDTO;
 import com.example.FinBuddy.dto.WishlistSummaryDTO;
 import com.example.FinBuddy.entities.Portfolio;
 import com.example.FinBuddy.entities.WishlistItem;
+import com.example.FinBuddy.exceptions.DuplicateResourceException;
+import com.example.FinBuddy.exceptions.ExternalServiceException;
+import com.example.FinBuddy.exceptions.ResourceNotFoundException;
+import com.example.FinBuddy.exceptions.UnauthorizedAccessException;
 import com.example.FinBuddy.repositories.PortfolioRepository;
 import com.example.FinBuddy.repositories.WishlistRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,15 +37,22 @@ public class WishlistService {
     public WishlistItemDTO addToWishlist(Long portfolioId, AddWishlistItemRequest request) {
 
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Portfolio", "id", portfolioId));
 
         String symbol = request.getSymbol().toUpperCase();
 
         if (wishlistRepository.existsByPortfolioAndSymbol(portfolio, symbol)) {
-            throw new IllegalArgumentException("Symbol already exists in wishlist");
+            throw new DuplicateResourceException("Wishlist item", "symbol", symbol);
         }
 
-        Map<String, Object> stockData = stockPriceService.fetchStockData(symbol);
+        Map<String, Object> stockData;
+        try {
+            stockData = stockPriceService.fetchStockData(symbol);
+        } catch (Exception e) {
+            log.error("Failed to fetch stock data for symbol: {}", symbol, e);
+            throw new ExternalServiceException("Stock Price Service",
+                    "Failed to fetch stock data for symbol: " + symbol, e);
+        }
 
         BigDecimal currentPrice = (BigDecimal) stockData.get("currentPrice");
 
@@ -70,7 +81,7 @@ public class WishlistService {
     public List<WishlistItemDTO> getWishlist(Long portfolioId) {
 
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Portfolio", "id", portfolioId));
 
         return wishlistRepository.findByPortfolioOrderByAddedAtDesc(portfolio)
                 .stream()
@@ -86,8 +97,7 @@ public class WishlistService {
             Long portfolioId,
             Long itemId,
             BigDecimal targetPrice,
-            String notes
-    ) {
+            String notes) {
 
         WishlistItem item = getValidatedItem(portfolioId, itemId);
 
@@ -121,15 +131,13 @@ public class WishlistService {
     public List<WishlistItemDTO> refreshPrices(Long portfolioId) {
 
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Portfolio", "id", portfolioId));
 
-        List<WishlistItem> items =
-                wishlistRepository.findByPortfolioOrderByAddedAtDesc(portfolio);
+        List<WishlistItem> items = wishlistRepository.findByPortfolioOrderByAddedAtDesc(portfolio);
 
         for (WishlistItem item : items) {
             try {
-                Map<String, Object> stockData =
-                        stockPriceService.fetchStockData(item.getSymbol());
+                Map<String, Object> stockData = stockPriceService.fetchStockData(item.getSymbol());
 
                 item.setCurrentPrice((BigDecimal) stockData.get("currentPrice"));
                 item.setChangeAmount((BigDecimal) stockData.get("changeAmount"));
@@ -143,6 +151,7 @@ public class WishlistService {
             } catch (Exception e) {
                 log.error("Price refresh failed for {}: {}",
                         item.getSymbol(), e.getMessage());
+                // Continue with other items even if one fails
             }
         }
 
@@ -160,19 +169,17 @@ public class WishlistService {
     public WishlistSummaryDTO getWishlistSummary(Long portfolioId) {
 
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Portfolio", "id", portfolioId));
 
         WishlistSummaryDTO summary = new WishlistSummaryDTO();
         summary.setTotalWatchlist(wishlistRepository.countByPortfolio(portfolio));
         summary.setGainersCount(wishlistRepository.countGainers(portfolio));
         summary.setLosersCount(wishlistRepository.countLosers(portfolio));
         summary.setAlertsCount(
-                wishlistRepository.countActiveAlerts(portfolio)
-        );
+                wishlistRepository.countActiveAlerts(portfolio));
 
         return summary;
     }
-
 
     /**
      * ===== Helpers =====
@@ -180,10 +187,10 @@ public class WishlistService {
     private WishlistItem getValidatedItem(Long portfolioId, Long itemId) {
 
         WishlistItem item = wishlistRepository.findById(itemId)
-                .orElseThrow(() -> new IllegalArgumentException("Wishlist item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Wishlist item", "id", itemId));
 
         if (!item.getPortfolio().getId().equals(portfolioId)) {
-            throw new IllegalArgumentException("Unauthorized portfolio access");
+            throw new UnauthorizedAccessException("Wishlist item", itemId);
         }
 
         return item;

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +78,7 @@ public class Portfolio {
 
         if (this.totalInvestment.compareTo(BigDecimal.ZERO) > 0) {
             this.gainLossPercentage = this.totalGainLoss
-                    .divide(this.totalInvestment, 4, BigDecimal.ROUND_HALF_UP)
+                    .divide(this.totalInvestment, 4, RoundingMode.HALF_UP)
                     .multiply(new BigDecimal("100"));
         } else {
             this.gainLossPercentage = BigDecimal.ZERO;

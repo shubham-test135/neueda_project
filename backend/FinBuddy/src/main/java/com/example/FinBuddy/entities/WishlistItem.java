@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Entity
@@ -29,10 +30,10 @@ public class WishlistItem {
     private Portfolio portfolio;
 
     @Column(nullable = false)
-    private String symbol;   // AAPL, INFY, TCS
+    private String symbol; // AAPL, INFY, TCS
 
     @Column(nullable = false)
-    private String name;     // Apple Inc.
+    private String name; // Apple Inc.
 
     @Column(nullable = false)
     private String category; // STOCK, ETF, MF, BOND
@@ -82,7 +83,7 @@ public class WishlistItem {
         }
 
         return currentPrice.subtract(priceWhenAdded)
-                .divide(priceWhenAdded, 4, BigDecimal.ROUND_HALF_UP)
+                .divide(priceWhenAdded, 4, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
     }
 

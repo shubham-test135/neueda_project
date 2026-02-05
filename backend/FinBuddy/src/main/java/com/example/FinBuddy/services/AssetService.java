@@ -85,10 +85,43 @@ public class AssetService {
 
     /**
      * Search assets by name or symbol
+     * Searches across all asset types: Stocks, Bonds, Mutual Funds, and SIPs
      */
     @Transactional(readOnly = true)
     public List<Asset> searchAssets(String searchTerm) {
         return assetRepository.searchByNameOrSymbol(searchTerm);
+    }
+
+    /**
+     * Search only stocks
+     */
+    @Transactional(readOnly = true)
+    public List<Asset> searchStocks(String searchTerm) {
+        return assetRepository.searchStocks(searchTerm);
+    }
+
+    /**
+     * Search only bonds
+     */
+    @Transactional(readOnly = true)
+    public List<Asset> searchBonds(String searchTerm) {
+        return assetRepository.searchBonds(searchTerm);
+    }
+
+    /**
+     * Search only mutual funds
+     */
+    @Transactional(readOnly = true)
+    public List<Asset> searchMutualFunds(String searchTerm) {
+        return assetRepository.searchMutualFunds(searchTerm);
+    }
+
+    /**
+     * Search only SIPs
+     */
+    @Transactional(readOnly = true)
+    public List<Asset> searchSIPs(String searchTerm) {
+        return assetRepository.searchSIPs(searchTerm);
     }
 
     /**

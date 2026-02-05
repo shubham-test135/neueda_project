@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -89,7 +90,7 @@ public abstract class Asset {
 
         if (this.investedAmount.compareTo(BigDecimal.ZERO) > 0) {
             this.gainLossPercentage = this.gainLoss
-                    .divide(this.investedAmount, 4, BigDecimal.ROUND_HALF_UP)
+                    .divide(this.investedAmount, 4, RoundingMode.HALF_UP)
                     .multiply(new BigDecimal("100"));
         } else {
             this.gainLossPercentage = BigDecimal.ZERO;

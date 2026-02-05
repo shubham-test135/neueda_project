@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="../css/dashboard.css" />
     <link rel="stylesheet" href="../css/components.css" />
     <link rel="stylesheet" href="../css/analytics-wishlist.css" />
+    <link rel="stylesheet" href="../css/wishlist-enhanced.css" />
   </head>
   <body>
     <!-- Sidebar Navigation -->
@@ -133,6 +134,88 @@
               </div>
             </div>
           </section>
+
+          <!-- Add to Wishlist Form -->
+          <div
+            class="add-asset-form"
+            id="addWishlistForm"
+            style="display: none"
+          >
+            <div class="form-header">
+              <h3><i class="fas fa-star"></i> Add to Wishlist</h3>
+              <button class="close-form-btn" id="cancelWishlistBtn">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <form id="wishlistForm">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label><i class="fas fa-layer-group"></i> Asset Type</label>
+                  <select id="wishlistAssetType" class="form-select" required>
+                    <option value="">Select Type</option>
+                    <option value="STOCK">Stock</option>
+                    <option value="BOND">Bond</option>
+                    <option value="MUTUAL_FUND">Mutual Fund</option>
+                    <option value="SIP">SIP</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label><i class="fas fa-tag"></i> Name</label>
+                  <div class="search-wrapper">
+                    <input
+                      type="text"
+                      id="wishlistAssetName"
+                      class="form-input"
+                      placeholder="Search for stocks, bonds, mutual funds..."
+                      autocomplete="off"
+                      required
+                    />
+                    <div
+                      class="asset-search-results"
+                      id="wishlistSearchResults"
+                      style="display: none"
+                    ></div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label><i class="fas fa-code"></i> Symbol</label>
+                  <input
+                    type="text"
+                    id="wishlistAssetSymbol"
+                    class="form-input"
+                    placeholder="Symbol (auto-filled from search)"
+                    readonly
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label
+                    ><i class="fas fa-dollar-sign"></i> Target Price
+                    (Optional)</label
+                  >
+                  <input
+                    type="number"
+                    step="0.01"
+                    id="wishlistTargetPrice"
+                    class="form-input"
+                    placeholder="Set target price"
+                  />
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-star"></i> Add to Wishlist
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  id="cancelWishlistBtn2"
+                >
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              </div>
+            </form>
+          </div>
 
           <!-- Wishlist Items -->
           <section class="section-card" aria-labelledby="wishlist-heading">
@@ -307,7 +390,13 @@
                   <span class="trending-price">$512.40</span>
                   <span class="trending-change positive">+5.8%</span>
                 </div>
-                <button class="btn-icon" aria-label="Add NVIDIA to wishlist">
+                <button
+                  class="btn-icon"
+                  onclick="
+                    addTrendingToWishlist('NVDA', 'NVIDIA Corporation', 'STOCK')
+                  "
+                  aria-label="Add NVIDIA to wishlist"
+                >
                   <i class="far fa-star"></i>
                 </button>
               </article>
@@ -322,7 +411,11 @@
                   <span class="trending-price">$248.50</span>
                   <span class="trending-change positive">+3.2%</span>
                 </div>
-                <button class="btn-icon" aria-label="Add Tesla to wishlist">
+                <button
+                  class="btn-icon"
+                  onclick="addTrendingToWishlist('TSLA', 'Tesla Inc.', 'STOCK')"
+                  aria-label="Add Tesla to wishlist"
+                >
                   <i class="far fa-star"></i>
                 </button>
               </article>
@@ -337,7 +430,13 @@
                   <span class="trending-price">$385.20</span>
                   <span class="trending-change positive">+2.1%</span>
                 </div>
-                <button class="btn-icon" aria-label="Add Meta to wishlist">
+                <button
+                  class="btn-icon"
+                  onclick="
+                    addTrendingToWishlist('META', 'Meta Platforms', 'STOCK')
+                  "
+                  aria-label="Add Meta to wishlist"
+                >
                   <i class="far fa-star"></i>
                 </button>
               </article>
@@ -349,76 +448,6 @@
         <footer id="footer-container"></footer>
       </main>
     </div>
-
-    <!-- Add to Wishlist Modal -->
-    <dialog id="addWishlistModal" class="modal" aria-labelledby="modal-title">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 id="modal-title">Add to Wishlist</h2>
-          <button class="modal-close" aria-label="Close modal">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="addWishlistForm">
-            <div class="form-group">
-              <label for="symbolInput">Symbol / Ticker</label>
-              <input
-                type="text"
-                id="symbolInput"
-                class="input-field"
-                placeholder="e.g., AAPL, GOOGL, MSFT"
-                required
-                aria-required="true"
-              />
-            </div>
-            <div class="form-group">
-              <label for="categoryInput">Category</label>
-              <select
-                id="categoryInput"
-                class="select-input"
-                required
-                aria-required="true"
-              >
-                <option value="">Select category</option>
-                <option value="stocks">Stocks</option>
-                <option value="bonds">Bonds</option>
-                <option value="crypto">Cryptocurrency</option>
-                <option value="etf">ETFs</option>
-                <option value="mutualfunds">Mutual Funds</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="targetPriceInput">Target Price (Optional)</label>
-              <input
-                type="number"
-                id="targetPriceInput"
-                class="input-field"
-                placeholder="Set target price for alerts"
-                step="0.01"
-              />
-            </div>
-            <div class="form-group">
-              <label for="notesInput">Notes (Optional)</label>
-              <textarea
-                id="notesInput"
-                class="textarea-field"
-                rows="3"
-                placeholder="Add your investment thesis or notes..."
-              ></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary" id="cancelWishlistBtn">
-            Cancel
-          </button>
-          <button type="submit" form="addWishlistForm" class="btn-primary">
-            <i class="fas fa-star"></i> Add to Wishlist
-          </button>
-        </div>
-      </div>
-    </dialog>
 
     <!-- Common Modals -->
     <div id="modals-container"></div>
