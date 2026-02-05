@@ -3,6 +3,7 @@ package com.example.FinBuddy.controllers;
 import com.example.FinBuddy.services.EmailService;
 import com.example.FinBuddy.services.PDFReportService;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,20 +23,27 @@ public class ReportController {
 
     // Endpoint to generate and download the PDF report
     @GetMapping("/portfolio/{portfolioId}/pdf")
-    public ResponseEntity<byte[]> generatePdf(@PathVariable Long portfolioId) {
+    public ResponseEntity<byte[]> generatePdf(@PathVariable Long portfolioId,@RequestParam(defaultValue = "download") String mode) {
         try {
             // Generate PDF report
             byte[] pdfBytes = pdfReportService.generatePortfolioReport(portfolioId);
 
+            String contentDisposition =
+                    "preview".equalsIgnoreCase(mode)
+                            ? "inline; filename=portfolio-report-" + portfolioId + ".pdf"
+                            : "attachment; filename=portfolio-report-" + portfolioId + ".pdf";
+
             // Return the PDF as a downloadable response
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=portfolio-report-" + portfolioId + ".pdf")
-                    .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                    .contentType(MediaType.APPLICATION_PDF)
                     .body(pdfBytes);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+    @GetMapping("/port")
 
     // Endpoint to send the PDF report via email
     @PostMapping("/email")

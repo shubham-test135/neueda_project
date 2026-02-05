@@ -61,10 +61,6 @@ function setupEventListeners() {
   const downloadPdfBtn = document.getElementById("downloadPdfBtn");
   if (downloadPdfBtn) downloadPdfBtn.addEventListener("click", downloadPdf);
 
-  // Enhanced features (if elements exist)
-  const exportCsvBtn = document.getElementById("exportCsvBtn");
-  if (exportCsvBtn) exportCsvBtn.addEventListener("click", exportToCSV);
-
   const shareBtn = document.getElementById("shareBtn");
   if (shareBtn) shareBtn.addEventListener("click", sharePortfolio);
 

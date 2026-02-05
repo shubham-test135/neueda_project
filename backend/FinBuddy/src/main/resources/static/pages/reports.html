@@ -42,6 +42,13 @@
             </div>
           </div>
 
+          <div id="pdfPreviewContainer" style="display:none; margin-top:20px;">
+            <iframe id="pdfPreviewFrame"
+                    width="100%"
+                    height="600px">
+            </iframe>
+          </div>
+
           <!-- Report Options -->
           <div class="section-card">
             <div class="section-header">
@@ -51,14 +58,14 @@
               </div>
             </div>
             <div class="quick-actions">
+              <button type="button" class="action-card" id="previewPdfBtn">
+                <i class="fas fa-file-pdf"></i>
+                <span>Preview Report</span>
+              </button>
               <button class="action-card" id="downloadPdfBtn">
                 <i class="fas fa-file-pdf"></i>
                 <span>PDF Report</span>
               </button>
-<!--              <button class="action-card" id="downloadExcelBtn">-->
-<!--                <i class="fas fa-file-excel"></i>-->
-<!--                <span>Excel Report</span>-->
-<!--              </button>-->
 <!--              <button class="action-card" id="downloadCsvBtn">-->
 <!--                <i class="fas fa-file-csv"></i>-->
 <!--                <span>CSV Export</span>-->
