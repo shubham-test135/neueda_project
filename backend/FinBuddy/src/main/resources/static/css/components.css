@@ -473,6 +473,46 @@
 }
 
 /* ===== Responsive Helpers ===== */
+
+/* Chart Responsive Container */
+.chart-card {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  padding: var(--spacing-lg);
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+}
+
+.chart-card canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 400px;
+}
+
+/* Responsive grid for charts */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card {
+    min-height: 350px;
+  }
+
+  .chart-card canvas {
+    max-height: 350px;
+  }
+}
+
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
@@ -484,12 +524,47 @@
     grid-template-columns: 1fr;
   }
 
+  .portfolio-card {
+    padding: var(--spacing-md);
+  }
+
+  .portfolio-card-stats {
+    grid-template-columns: 1fr;
+  }
+
   .search-bar-full {
     flex-direction: column;
   }
 
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .action-buttons-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Chart adjustments */
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card {
+    min-height: 300px;
+    padding: var(--spacing-md);
+  }
+
+  .chart-card canvas {
+    max-height: 300px;
+  }
+
+  .chart-title {
+    font-size: 1rem;
+  }
+
+  /* Price cards */
+  .live-prices-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -632,9 +707,6 @@
   }
 }
 
-
-
-
 @media (max-width: 480px) {
   .page-title {
     font-size: 1.5rem;
@@ -646,5 +718,58 @@
 
   .action-buttons-grid {
     grid-template-columns: 1fr;
+  }
+
+  .portfolio-card-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .portfolio-card-body h3 {
+    font-size: 1.125rem;
+  }
+
+  /* Chart mobile optimization */
+  .chart-card {
+    min-height: 250px;
+    padding: var(--spacing-sm);
+  }
+
+  .chart-card canvas {
+    max-height: 250px;
+  }
+
+  .chart-title {
+    font-size: 0.875rem;
+  }
+
+  /* Stat boxes */
+  .stat-box {
+    padding: var(--spacing-sm);
+  }
+
+  .stat-box-value {
+    font-size: 1.25rem;
+  }
+
+  /* Price cards */
+  .price-card {
+    padding: var(--spacing-sm);
+  }
+
+  .price-card-price {
+    font-size: 1.25rem;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .chart-card {
+    min-height: 200px;
+  }
+
+  .chart-card canvas {
+    max-height: 200px;
   }
 }

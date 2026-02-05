@@ -10,7 +10,7 @@ import {
   formatCurrency,
   formatPercentage,
 } from "../utils/ui.js";
-import {initGlobalNavbar} from "../navbar.js";
+import { initGlobalNavbar } from "../navbar.js";
 
 let currentPortfolioId = null;
 let charts = {};
@@ -76,14 +76,15 @@ async function handlePortfolioChange(event) {
 async function loadDashboardData(portfolioId) {
   showLoading();
   try {
-    const dashboard = await portfolioAPI.getDashboard(portfolioId);
+    const [dashboard, portfolio] = await Promise.all([
+      portfolioAPI.getDashboard(portfolioId),
+      portfolioAPI.getById(portfolioId)
+    ]);
 
-    console.log("FULL DASHBOARD:", dashboard);
-    console.log("ASSET ALLOCATION:", dashboard.assetAllocation);
-
+    updatePortfolioName(portfolio);
     updateSummaryCards(dashboard);
     updateCharts(dashboard);
-    updateBenchmarks(portfolioId);
+    updateBenchmarks(portfolioId, dashboard);
     hideLoading();
   } catch (error) {
     console.error("Error loading dashboard:", error);
@@ -92,6 +93,12 @@ async function loadDashboardData(portfolioId) {
   }
 }
 
+function updatePortfolioName(portfolio) {
+  const portfolioNameEl = document.getElementById("portfolioNameDisplay");
+  if (portfolioNameEl && portfolio) {
+    portfolioNameEl.textContent = portfolio.name || "-";
+  }
+}
 
 function updateSummaryCards(dashboard) {
   document.getElementById("totalValue").textContent = formatCurrency(
@@ -112,8 +119,7 @@ function updateSummaryCards(dashboard) {
     `;
   gainLossPercent.className = `card-percentage ${gainLossPercentValue >= 0 ? "positive" : "negative"}`;
 
-  document.getElementById("assetCount").textContent =
-    dashboard.assetCount || 0;
+  document.getElementById("assetCount").textContent = dashboard.assetCount || 0;
 }
 
 function updateCharts(dashboard) {
@@ -232,7 +238,7 @@ function renderTopPerformersChart(data) {
   });
 }
 
-async function updateBenchmarks(portfolioId) {
+async function updateBenchmarks(portfolioId, dashboard) {
   try {
     const [sp500, nifty] = await Promise.all([
       marketAPI.getBenchmark("SP500"),
@@ -245,6 +251,24 @@ async function updateBenchmarks(portfolioId) {
     document.getElementById("nifty50Value").textContent = formatCurrency(
       nifty.value,
     );
+
+    // Update portfolio return section
+    if (dashboard) {
+      const portfolioValueEl = document.getElementById("portfolioReturnValue");
+      const portfolioChangeEl = document.getElementById("portfolioChange");
+
+      if (portfolioValueEl) {
+        portfolioValueEl.textContent = formatCurrency(
+          dashboard.totalValue || 0,
+        );
+      }
+
+      if (portfolioChangeEl) {
+        const changePercent = dashboard.gainLossPercentage || 0;
+        portfolioChangeEl.textContent = formatPercentage(changePercent);
+        portfolioChangeEl.className = `benchmark-change ${changePercent >= 0 ? "positive" : "negative"}`;
+      }
+    }
   } catch (error) {
     console.error("Error loading benchmarks:", error);
   }

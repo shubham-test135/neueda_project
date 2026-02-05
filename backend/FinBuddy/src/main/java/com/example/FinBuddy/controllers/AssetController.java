@@ -201,6 +201,21 @@ public class AssetController {
     }
 
     /**
+     * Partially sell asset (reduce quantity)
+     */
+    @PostMapping("/{id}/sell")
+    public ResponseEntity<Asset> sellAsset(
+            @PathVariable Long id,
+            @RequestParam Double quantityToSell) {
+        try {
+            Asset updated = assetService.sellAsset(id, quantityToSell);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
      * Get stocks only
      */
     @GetMapping("/stocks")

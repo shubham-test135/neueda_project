@@ -13,8 +13,6 @@
  * @param {boolean} options.showPurchaseFields - Show purchase price/date (default: false for wishlist)
  */
 export function showAssetModal(options = {}) {
-  console.log("showAssetModal called with options:", options);
-
   const {
     title = "Add Asset",
     submitText = "Add",
@@ -40,7 +38,6 @@ export function showAssetModal(options = {}) {
   });
 
   document.body.appendChild(modal);
-  console.log("Modal appended to body:", modal);
 
   // Setup event listeners
   const closeBtn = modal.querySelector(".modal-close");
@@ -73,12 +70,10 @@ export function showAssetModal(options = {}) {
   try {
     if (typeof modal.showModal === "function") {
       modal.showModal();
-      console.log("Modal shown using showModal()");
     } else {
       // Fallback for older browsers
       modal.style.display = "flex";
       modal.setAttribute("open", "");
-      console.log("Modal shown using fallback method");
     }
   } catch (error) {
     console.error("Error showing modal:", error);

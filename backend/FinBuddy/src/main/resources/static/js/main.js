@@ -9,7 +9,6 @@ import { initTheme } from "./utils/theme.js";
 import { initUI } from "./utils/ui.js";
 import { initAiChat } from "./ai-chat.js";
 
-
 // Initialize app when DOM is ready
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -21,8 +20,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     initTheme();
     initUI();
     initAiChat();
-
-    console.log("✅ FinBuddy initialized successfully");
   } catch (error) {
     console.error("❌ Error initializing app:", error);
   }

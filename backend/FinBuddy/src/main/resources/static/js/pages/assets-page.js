@@ -168,6 +168,7 @@ function renderAssets(assets) {
             <td>${asset.symbol}</td>
             <td><span class="badge badge-primary">${asset.assetType}</span></td>
             <td>${asset.quantity}</td>
+            <td>${formatCurrency(asset.purchasePrice || 0, asset.currency)}</td>
             <td>${formatCurrency(asset.currentPrice || 0, asset.currency)}</td>
             <td>${formatCurrency(asset.currentValue || 0, asset.currency)}</td>
             <td class="${(asset.gainLoss || 0) >= 0 ? "positive" : "negative"}">
@@ -177,8 +178,8 @@ function renderAssets(assets) {
                 ${formatPercentage(asset.gainLossPercentage || 0)}
             </td>
             <td>
-                <button class="chart-btn" onclick="editAsset(${asset.id})" title="Edit">
-                    <i class="fas fa-edit"></i>
+                <button class="chart-btn" onclick="sellAsset(${asset.id}, ${asset.quantity})" title="Sell">
+                    <i class="fas fa-dollar-sign"></i>
                 </button>
                 <button class="chart-btn" onclick="deleteAsset(${asset.id})" title="Delete">
                     <i class="fas fa-trash"></i>
@@ -329,9 +330,41 @@ async function fetchStockPrice(symbol) {
 }
 
 // Global functions
-window.editAsset = async function (id) {
-  console.log("Edit asset:", id);
-  // TODO: Implement edit functionality
+window.sellAsset = async function (id, maxQuantity) {
+  const quantityToSell = prompt(
+    `Enter quantity to sell (max: ${maxQuantity}):`,
+    maxQuantity,
+  );
+
+  if (quantityToSell === null) {
+    return; // User cancelled
+  }
+
+  const qty = parseFloat(quantityToSell);
+
+  if (isNaN(qty) || qty <= 0) {
+    showToast("Invalid quantity", "error");
+    return;
+  }
+
+  if (qty > maxQuantity) {
+    showToast("Cannot sell more than owned quantity", "error");
+    return;
+  }
+
+  showLoading();
+  try {
+    await assetAPI.sell(id, qty);
+    showToast("Asset sold successfully", "success");
+    if (currentPortfolioId) {
+      await loadAssets(currentPortfolioId);
+    }
+    hideLoading();
+  } catch (error) {
+    console.error("Error selling asset:", error);
+    showToast("Failed to sell asset", "error");
+    hideLoading();
+  }
 };
 
 window.deleteAsset = async function (id) {
