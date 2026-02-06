@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Connection Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      pre {
+        background-color: #f4f4f4;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>FinBuddy API Connection Test</h1>
+
+    <div class="test-section">
+      <h2>Backend Status</h2>
+      <p>
+        Backend URL: <strong id="backend-url">http://localhost:8081/api</strong>
+      </p>
+      <button onclick="testHealth()">Test Health Endpoint</button>
+      <button onclick="testHello()">Test Hello Endpoint</button>
+      <button onclick="testPortfolios()">Test Portfolios Endpoint</button>
+      <div id="result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>CORS Test</h2>
+      <p>Current Origin: <strong id="current-origin"></strong></p>
+      <p>
+        Allowed Origins: http://localhost:5500, http://127.0.0.1:5500,
+        http://localhost:3000, http://localhost:8080
+      </p>
+    </div>
+
+    <script>
+      // Use same hostname as current page to avoid localhost vs 127.0.0.1 issues
+      const hostname = window.location.hostname;
+      const API_BASE_URL = `http://${hostname}:8081/api`;
+      document.getElementById("current-origin").textContent =
+        window.location.origin;
+      document.getElementById("backend-url").textContent = API_BASE_URL;
+
+      async function testEndpoint(endpoint, name) {
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = `<p>Testing ${name}...</p>`;
+
+        try {
+          console.log(`Fetching: ${API_BASE_URL}${endpoint}`);
+
+          const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            mode: "cors",
+          });
+
+          console.log("Response status:", response.status);
+          console.log("Response headers:", [...response.headers.entries()]);
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          resultDiv.innerHTML = `
+                    <div class="success">
+                        <h3>✓ ${name} - Success!</h3>
+                        <p>Status: ${response.status} ${response.statusText}</p>
+                        <p>Response:</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+        } catch (error) {
+          console.error("Error:", error);
+          resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>✗ ${name} - Failed!</h3>
+                        <p>Error: ${error.message}</p>
+                        <p><strong>Troubleshooting:</strong></p>
+                        <ul>
+                            <li>Ensure backend is running on port 8081</li>
+                            <li>Check if CORS is properly configured</li>
+                            <li>Verify current origin (${window.location.origin}) is in allowed origins</li>
+                            <li>Open browser console (F12) for detailed error logs</li>
+                        </ul>
+                    </div>
+                `;
+        }
+      }
+
+      function testHealth() {
+        testEndpoint("/health", "Health Check");
+      }
+
+      function testHello() {
+        testEndpoint("/hello", "Hello Endpoint");
+      }
+
+      function testPortfolios() {
+        testEndpoint("/portfolios", "Portfolios Endpoint");
+      }
+
+      // Auto-test on load
+      window.addEventListener("load", () => {
+        console.log("Page loaded. Origin:", window.location.origin);
+        console.log("API Base URL:", API_BASE_URL);
+      });
+    </script>
+  </body>
+</html>
