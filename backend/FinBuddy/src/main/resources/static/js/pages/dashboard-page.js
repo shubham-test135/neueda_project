@@ -78,7 +78,7 @@ async function loadDashboardData(portfolioId) {
   try {
     const [dashboard, portfolio] = await Promise.all([
       portfolioAPI.getDashboard(portfolioId),
-      portfolioAPI.getById(portfolioId)
+      portfolioAPI.getById(portfolioId),
     ]);
 
     updatePortfolioName(portfolio);
