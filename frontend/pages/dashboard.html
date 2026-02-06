@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - FinBuddy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Top Navbar -->
+      <div id="navbar-container"></div>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <div class="content-wrapper">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">
+                <i class="fas fa-home"></i>
+                Dashboard - <span id="portfolioNameDisplay">-</span>
+              </h1>
+              <p class="page-subtitle">
+                Overview of your portfolio performance
+              </p>
+            </div>
+          </div>
+
+          <!-- Dashboard Summary Cards -->
+          <div class="summary-cards" id="summaryCards">
+            <div class="card card-animated">
+              <div class="card-header">
+                <div class="card-icon gradient-blue">
+                  <i class="fas fa-wallet"></i>
+                </div>
+                <div class="card-trend positive">
+                  <i class="fas fa-arrow-up"></i>
+                  <span id="totalValueTrend">+0%</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">Total Value</h3>
+                <p class="card-value" id="totalValue">$0.00</p>
+                <small class="card-subtitle">Current Portfolio Worth</small>
+              </div>
+            </div>
+
+            <div class="card card-animated">
+              <div class="card-header">
+                <div class="card-icon gradient-purple">
+                  <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="card-info">
+                  <i class="fas fa-info-circle"></i>
+                </div>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">Total Investment</h3>
+                <p class="card-value" id="totalInvestment">$0.00</p>
+                <small class="card-subtitle">Amount Invested</small>
+              </div>
+            </div>
+
+            <div class="card card-animated">
+              <div class="card-header">
+                <div class="card-icon gradient-green">
+                  <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="card-trend" id="gainLossTrend">
+                  <i class="fas fa-arrow-up"></i>
+                  <span>0%</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">Gain/Loss</h3>
+                <p class="card-value" id="gainLoss">$0.00</p>
+                <p class="card-percentage" id="gainLossPercent">
+                  <i class="fas fa-arrow-up"></i> 0%
+                </p>
+                <small class="card-subtitle">Profit/Loss</small>
+              </div>
+            </div>
+
+            <div class="card card-animated">
+              <div class="card-header">
+                <div class="card-icon gradient-orange">
+                  <i class="fas fa-coins"></i>
+                </div>
+                <div class="card-badge">
+                  <span>Active</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">Total Assets</h3>
+                <p class="card-value" id="assetCount">0</p>
+                <small class="card-subtitle">Holdings Count</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Bar -->
+          <div class="quick-actions">
+            <a href="assets.html" class="action-card">
+              <i class="fas fa-plus-circle"></i>
+              <span>Add Asset</span>
+            </a>
+            <a href="reports.html" class="action-card">
+              <i class="fas fa-file-pdf"></i>
+              <span>Download PDF</span>
+            </a>
+          </div>
+
+          <!-- Charts Section -->
+          <div class="charts-grid">
+            <!-- Asset Allocation Pie Chart -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3><i class="fas fa-chart-pie"></i> Asset Allocation</h3>
+              </div>
+              <div class="chart-body">
+                <canvas id="assetAllocationChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Portfolio Performance Line Chart -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <h3><i class="fas fa-chart-line"></i> Portfolio Growth</h3>
+              </div>
+              <div class="chart-body">
+                <canvas id="portfolioGrowthChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Asset Performance Bar Chart -->
+          <div class="chart-card chart-card-full">
+            <div class="chart-header">
+              <h3><i class="fas fa-trophy"></i> Top Performing Assets</h3>
+            </div>
+            <div class="chart-body">
+              <canvas id="assetPerformanceChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Benchmark Comparison -->
+          <div class="section-card">
+            <div class="section-header">
+              <div class="section-title">
+                <i class="fas fa-chart-bar"></i>
+                <h2>Benchmark Comparison</h2>
+              </div>
+            </div>
+            <div class="benchmark-grid">
+              <div class="benchmark-card">
+                <div class="benchmark-icon">
+                  <i class="fas fa-globe-americas"></i>
+                </div>
+                <div class="benchmark-info">
+                  <h4>S&P 500</h4>
+                  <p class="benchmark-value" id="sp500Value">-</p>
+                  <span class="benchmark-change positive">+2.5%</span>
+                </div>
+              </div>
+              <div class="benchmark-card">
+                <div class="benchmark-icon">
+                  <i class="fas fa-flag"></i>
+                </div>
+                <div class="benchmark-info">
+                  <h4>NIFTY 50</h4>
+                  <p class="benchmark-value" id="nifty50Value">-</p>
+                  <span class="benchmark-change positive">+1.8%</span>
+                </div>
+              </div>
+              <div class="benchmark-card">
+                <div class="benchmark-icon">
+                  <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="benchmark-info">
+                  <h4>Your Portfolio</h4>
+                  <p class="benchmark-value" id="portfolioReturnValue">-</p>
+                  <span class="benchmark-change" id="portfolioChange">0%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div id="footer-container"></div>
+      </main>
+    </div>
+
+    <!-- Common Modals -->
+    <div id="modals-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay-container"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script type="module" src="../js/main.js"></script>
+    <script type="module" src="../js/pages/dashboard-page.js"></script>
+  </body>
+</html>

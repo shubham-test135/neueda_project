@@ -1,0 +1,260 @@
+<!-- Modals Component -->
+
+<!-- Portfolio Creation Modal -->
+<div id="portfolioModal" class="modal">
+  <div class="modal-content modal-modern">
+    <div class="modal-header">
+      <h2><i class="fas fa-plus-circle"></i> Create New Portfolio</h2>
+      <button class="modal-close" id="closePortfolioModal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <form id="portfolioForm">
+      <div class="modal-body">
+        <div class="form-group">
+          <label><i class="fas fa-briefcase"></i> Portfolio Name</label>
+          <input
+            type="text"
+            id="portfolioName"
+            class="form-input"
+            placeholder="My Investment Portfolio"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-file-alt"></i> Description</label>
+          <textarea
+            id="portfolioDescription"
+            class="form-input"
+            rows="3"
+            placeholder="Brief description of your portfolio..."
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-money-bill"></i> Base Currency</label>
+          <select id="portfolioBaseCurrency" class="form-select">
+            <option value="USD">USD - US Dollar</option>
+            <option value="EUR">EUR - Euro</option>
+            <option value="GBP">GBP - British Pound</option>
+            <option value="INR">INR - Indian Rupee</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-check"></i> Create Portfolio
+        </button>
+        <button type="button" class="btn btn-secondary close-modal">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Portfolio Modal -->
+<div id="editPortfolioModal" class="modal">
+  <div class="modal-content modal-modern">
+    <div class="modal-header">
+      <h2><i class="fas fa-edit"></i> Edit Portfolio</h2>
+      <button class="modal-close" id="closeEditPortfolioModal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <form id="editPortfolioForm">
+      <div class="modal-body">
+        <input type="hidden" id="editPortfolioId" />
+        <div class="form-group">
+          <label><i class="fas fa-briefcase"></i> Portfolio Name</label>
+          <input
+            type="text"
+            id="editPortfolioName"
+            class="form-input"
+            placeholder="My Investment Portfolio"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-file-alt"></i> Description</label>
+          <textarea
+            id="editPortfolioDescription"
+            class="form-input"
+            rows="3"
+            placeholder="Brief description of your portfolio..."
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-money-bill"></i> Base Currency</label>
+          <select id="editPortfolioBaseCurrency" class="form-select">
+            <option value="USD">USD - US Dollar</option>
+            <option value="EUR">EUR - Euro</option>
+            <option value="GBP">GBP - British Pound</option>
+            <option value="INR">INR - Indian Rupee</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-check"></i> Update Portfolio
+        </button>
+        <button type="button" class="btn btn-secondary close-modal">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Stock Details Modal -->
+<div id="stockDetailsModal" class="modal">
+  <div class="modal-content modal-modern">
+    <div class="modal-header">
+      <h2><i class="fas fa-chart-line"></i> Stock Details</h2>
+      <button class="modal-close" id="closeStockDetailsModal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div
+        class="stock-details-loading"
+        style="display: none; text-align: center; padding: 20px"
+      >
+        <i class="fas fa-spinner fa-spin fa-2x"></i>
+        <p>Loading stock details...</p>
+      </div>
+      <div class="stock-details-content">
+        <div class="stock-header" style="margin-bottom: 20px">
+          <h3
+            id="stockSymbol"
+            style="margin: 0; color: var(--primary-color)"
+          ></h3>
+          <p
+            id="stockDescription"
+            style="margin: 5px 0; color: var(--text-secondary)"
+          ></p>
+        </div>
+
+        <div
+          class="stock-price-info"
+          style="
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+          "
+        >
+          <div
+            class="info-card"
+            style="
+              background: var(--bg-secondary);
+              padding: 15px;
+              border-radius: 8px;
+            "
+          >
+            <label style="font-size: 0.875rem; color: var(--text-secondary)"
+              >Current Price</label
+            >
+            <div
+              id="stockPrice"
+              style="
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: var(--primary-color);
+              "
+            ></div>
+          </div>
+          <div
+            class="info-card"
+            style="
+              background: var(--bg-secondary);
+              padding: 15px;
+              border-radius: 8px;
+            "
+          >
+            <label style="font-size: 0.875rem; color: var(--text-secondary)"
+              >Change</label
+            >
+            <div
+              id="stockChange"
+              style="font-size: 1.5rem; font-weight: bold"
+            ></div>
+          </div>
+          <div
+            class="info-card"
+            style="
+              background: var(--bg-secondary);
+              padding: 15px;
+              border-radius: 8px;
+            "
+          >
+            <label style="font-size: 0.875rem; color: var(--text-secondary)"
+              >Previous Close</label
+            >
+            <div
+              id="stockPreviousClose"
+              style="font-size: 1.25rem; font-weight: 600"
+            ></div>
+          </div>
+          <div
+            class="info-card"
+            style="
+              background: var(--bg-secondary);
+              padding: 15px;
+              border-radius: 8px;
+            "
+          >
+            <label style="font-size: 0.875rem; color: var(--text-secondary)"
+              >Change %</label
+            >
+            <div
+              id="stockChangePercent"
+              style="font-size: 1.25rem; font-weight: 600"
+            ></div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="stock-details-error"
+        style="
+          display: none;
+          text-align: center;
+          padding: 20px;
+          color: var(--danger-color);
+        "
+      >
+        <i class="fas fa-exclamation-circle fa-2x"></i>
+        <p>Failed to load stock details. Please try again.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary close-modal">
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- AI Chat Modal -->
+<div id="aiChatModal" class="modal">
+  <div class="modal-content ai-chat-modal">
+    <div class="modal-header">
+      <h3>FinBuddy Assistant</h3>
+      <span class="close" id="closeAiChat">&times;</span>
+    </div>
+
+    <div id="chatMessages" class="chat-messages">
+      <div class="chat-message bot">
+        Hi 👋 I can explain general finance concepts and how FinBuddy works.
+      </div>
+    </div>
+
+    <div class="chat-input">
+      <input
+        type="text"
+        id="chatInput"
+        placeholder="Ask a general finance question..."
+      />
+      <button id="sendChatBtn">Send</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-FinBuddyApplication<FinBuddy>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.example.FinBuddy.FinBuddyApplication",
+      "projectName": "FinBuddy",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

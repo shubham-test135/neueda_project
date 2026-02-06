@@ -1,0 +1,43 @@
+<!-- Top Navbar Component -->
+<nav class="navbar">
+  <div class="navbar-left">
+    <button class="mobile-menu-btn" id="mobileMenuBtn" title="Menu">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="portfolio-selector-nav">
+      <i class="fas fa-briefcase"></i>
+      <select id="portfolioSelect" class="portfolio-select">
+        <option value="">Select Portfolio</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="navbar-center">
+    <!-- Search bar removed -->
+  </div>
+
+  <div class="navbar-right">
+    <div class="currency-selector">
+      <i class="fas fa-rupee-sign"></i>
+      <select id="currencySelect" class="currency-select">
+        <option value="INR">₹ INR</option>
+        <option value="USD" selected>$ USD</option>
+        <option value="EUR">€ EUR</option>
+        <option value="GBP">£ GBP</option>
+      </select>
+    </div>
+    <button class="navbar-btn" id="refreshDataBtn" title="Refresh Data">
+      <i class="fas fa-sync-alt"></i>
+    </button>
+    <button class="navbar-btn" id="themeToggle" title="Toggle Theme">
+      <i class="fas fa-moon"></i>
+    </button>
+    <!--    <button class="navbar-btn btn-primary" id="createPortfolioBtn">-->
+    <!--      <i class="fas fa-plus"></i>-->
+    <!--      <span class="btn-text">New Portfolio</span>-->
+    <!--    </button>-->
+    <button id="aiChatBtn" class="navbar-btn" title="AI Assistant">
+      <i class="fas fa-robot"></i>
+    </button>
+  </div>
+</nav>
